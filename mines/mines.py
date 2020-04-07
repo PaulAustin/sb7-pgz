@@ -34,13 +34,18 @@ def build_grid(rows, cols, filler):
 
 # Add mines at random locations
 def place_mines(grid, rows, cols, mines):
-    while mines > 0:
+    # place n mines, if one already placed
+    # try again, but only so many attempts
+    # loop will alwasy exit.
+    max_tries = rows * cols * 2
+    while mines > 0 and maxtries > 0 :
         r = random.randint(0, rows - 1)
         c = random.randint(0, cols - 1)
         if grid[r][c] != 'M' :
             grid[r][c] = 'M'
             mines -= 1
         else:
+            max_tries -= 1
             continue
     return
 
