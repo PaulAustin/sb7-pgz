@@ -2,7 +2,7 @@
 
 # Imports
 import random
-from math import floor
+import math
 
 # Create the top tiles
 cover = Actor('cover')
@@ -24,21 +24,23 @@ tiles = {0: Actor('blank'),
 CELL_SIZE = 30
 
 # Functions
-def setup_empty_grid(wide, tall, filler):
+def setup_empty_grid(cols, rows, filler):
     grid = []
-    for y in range(tall):
+    for y in range(rows):
         row = []
-        for x in range(wide):
+        for x in range(cols):
             row.append(filler)
         grid.append(row)
     return grid
 
 # Add mines at random locations
-def populate_grid(grid, mines, wide, tall):
+def populate_grid(grid, cols, rows, mines):
     for mine in range(mines):
-        x, y = random.randint(0, wide - 1), random.randint(0,tall - 1)
+        x = random.randint(0, cols - 1)
+        y = random.randint(0, rows - 1)
         while grid[y][x] == 'M':
-            x, y = random.randint(0, wide - 1), random.randint(0,tall - 1)
+            x = random.randint(0, cols - 1)
+            y = random.randint(0, rows - 1)
         grid[y][x] = 'M'
     return grid
 
@@ -86,9 +88,8 @@ def draw():
 
 
 def on_mouse_down(pos, button):
-    mousepos = (floor(pos[0]/CELL_SIZE), floor(pos[1]/CELL_SIZE))
-    col = floor(pos[0]/CELL_SIZE)
-    row = floor(pos[1]/CELL_SIZE)
+    col = math.floor(pos[0]/CELL_SIZE)
+    row = math.floor(pos[1]/CELL_SIZE)
     if button == mouse.LEFT:
         # Left click tests cell
         if top_grid[row][col] != 'F':
@@ -142,5 +143,5 @@ top_grid  = setup_empty_grid(COLS, ROWS, 1)
 # base_grid holds mines/numeber of adjacent/or blanks
 # it is buil in three steps.
 base_grid = setup_empty_grid(COLS, ROWS, 0)
-base_grid = populate_grid(base_grid, MINES, COLS, ROWS)
+base_grid = populate_grid(base_grid, COLS, ROWS, MINES)
 base_grid = count_mines(base_grid)
