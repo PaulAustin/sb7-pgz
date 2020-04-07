@@ -34,11 +34,11 @@ def build_grid(rows, cols, filler):
 
 # Add mines at random locations
 def place_mines(grid, rows, cols, mines):
-    # place n mines, if one already placed
+    # Attempt to place n mines, if one already placed
     # try again, but only so many attempts
     # loop will alwasy exit.
     max_tries = rows * cols * 2
-    while mines > 0 and maxtries > 0 :
+    while mines > 0 and max_tries > 0 :
         r = random.randint(0, rows - 1)
         c = random.randint(0, cols - 1)
         if grid[r][c] != 'M' :
@@ -47,22 +47,29 @@ def place_mines(grid, rows, cols, mines):
         else:
             max_tries -= 1
             continue
+
+    # return True if all placed.
+    return mines == 0
+
+# For each cell if it is not a mine count how many mines are nearby
+def count_mines(grid):
+    # For each cell that has a mine, increment the cells around it.
+    # so long as they are not mines them selves.
+    for r in range(len(grid)):
+        for c in range(len(grid[0])):
+            if grid[r][c] == 'M':
+                inc_neighbors(grid, r, c)
     return
 
-# For each cell if it is not a mine count how many mines are near by
-def count_mines(grid):
-    for y in range(len(grid)):
-        for x in range(len(grid[0])):
-            if grid[y][x] != 'M':
-                neighbors = [(x - 1, y - 1), (x    , y - 1), (x + 1, y - 1),
-                             (x - 1, y    ),                 (x + 1, y    ),
-                             (x - 1, y + 1), (x    , y + 1), (x + 1, y + 1)]
-                for nx, ny in neighbors:
-                    try:
-                        if ny >= 0 and nx >= 0 and grid[ny][nx] == 'M':
-                            grid[y][x] += 1
-                    except:
-                        pass
+# Increment all mine neighbors
+def inc_neighbors(grid, r, c):
+    # Inc the 3x3 grid centered about the mine
+    # Watch out for edges. The center will be
+    # skipped since it is a mine as well.
+    for rn in range(max(0,r-1), min(r+2,len(grid))):
+        for cn in range(max(0,c-1), min(c+2,len(grid[0]))):
+            if grid[rn][cn] != 'M':
+                grid[rn][cn] += 1
     return
 
 # Update the board.
