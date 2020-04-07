@@ -93,8 +93,8 @@ def draw():
 
 def on_mouse_down(pos, button):
     mousepos = (floor(pos[0]/30), floor(pos[1]/30))
-    row = floor(pos[0]/30)
-    col = floor(pos[1]/30)
+    col = floor(pos[0]/30)
+    row = floor(pos[1]/30)
     if button == mouse.LEFT:
         if top_grid[row][col] != 'F':
             top_grid[row][col] = 0
