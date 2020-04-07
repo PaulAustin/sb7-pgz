@@ -1,7 +1,7 @@
 # To run this game type the command pgzrun mines.py into the terminal whilst in this directory
 
 # Imports
-from random import randint
+import random
 from math import floor
 
 # Create the top tiles
@@ -21,9 +21,7 @@ tiles = {0: Actor('blank'),
          'M': Actor('mine'),}
 
 # Game Setup
-wide  = 10
-tall  = 10
-mines = 10
+CELL_SIZE = 30
 
 # Functions
 def setup_empty_grid(wide, tall, filler):
@@ -38,9 +36,9 @@ def setup_empty_grid(wide, tall, filler):
 # Add mines at random locations
 def populate_grid(grid, mines, wide, tall):
     for mine in range(mines):
-        x, y = randint(0, wide - 1), randint(0,tall - 1)
+        x, y = random.randint(0, wide - 1), random.randint(0,tall - 1)
         while grid[y][x] == 'M':
-            x, y = randint(0, wide - 1), randint(0,tall - 1)
+            x, y = random.randint(0, wide - 1), random.randint(0,tall - 1)
         grid[y][x] = 'M'
     return grid
 
@@ -62,21 +60,23 @@ def count_mines(grid):
 
 # Update the board.
 def draw():
-    xpos, ypos = -15, -15
+    offset = -CELL_SIZE/2
+    xpos, ypos = offset, offset
     for row in range(len(base_grid)):
-        ypos += 30
-        xpos = -15
+        ypos += CELL_SIZE
+        xpos = offset
         for col in range(len(base_grid[0])):
-            xpos += 30
+            xpos += CELL_SIZE
             gridpos = base_grid[row][col]
             tiles[gridpos].pos = xpos, ypos
             tiles[gridpos].draw()
-    xpos, ypos = -15, -15
+
+    xpos, ypos = offset, offset
     for row in range(len(top_grid)):
-        ypos += 30
-        xpos = -15
+        ypos += CELL_SIZE
+        xpos = offset
         for col in range(len(top_grid[0])):
-            xpos += 30
+            xpos += CELL_SIZE
             if top_grid[row][col] == 1:
                 cover.pos = xpos, ypos
                 cover.draw()
@@ -86,9 +86,9 @@ def draw():
 
 
 def on_mouse_down(pos, button):
-    mousepos = (floor(pos[0]/30), floor(pos[1]/30))
-    col = floor(pos[0]/30)
-    row = floor(pos[1]/30)
+    mousepos = (floor(pos[0]/CELL_SIZE), floor(pos[1]/CELL_SIZE))
+    col = floor(pos[0]/CELL_SIZE)
+    row = floor(pos[1]/CELL_SIZE)
     if button == mouse.LEFT:
         # Left click tests cell
         if top_grid[row][col] != 'F':
@@ -127,17 +127,20 @@ def edge_detection(gridpos, grid):
                 pass
     return top_grid
 
-# Screen Setup
+# Basic game parameters
+ROWS = 10
+COLS = 10
+MINES = 10
+
+# Pygamezero will set the the screen based on the globals WIDTH and HEIGHT
+WIDTH = ((COLS * CELL_SIZE) + 1)
+HEIGHT = ((ROWS * CELL_SIZE) + 1)
 
 # top_grid holds banks or flags
-top_grid  = setup_empty_grid(wide, tall, 1)
+top_grid  = setup_empty_grid(COLS, ROWS, 1)
 
 # base_grid holds mines/numeber of adjacent/or blanks
 # it is buil in three steps.
-base_grid = setup_empty_grid(wide, tall, 0)
-base_grid = populate_grid(base_grid, mines, wide, tall)
+base_grid = setup_empty_grid(COLS, ROWS, 0)
+base_grid = populate_grid(base_grid, MINES, COLS, ROWS)
 base_grid = count_mines(base_grid)
-
-# Pygamezero will set the the screen based on the globals WIDTH and HEIGHT
-WIDTH = ((wide * 30) + 1)
-HEIGHT = ((tall * 30) + 1)
