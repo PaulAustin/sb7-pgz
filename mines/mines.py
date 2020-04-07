@@ -99,7 +99,7 @@ def on_mouse_down(pos, button):
         if top_grid[row][col] != 'F':
             top_grid[row][col] = 0
             if base_grid[row][col] == 0:
-                edge_detection((floor(pos[0]/30), floor(pos[1]/30)), base_grid)
+                edge_detection((col, row), base_grid)
     else:
         if top_grid[row][col] == 1:
             top_grid[row][col] = 'F'
