@@ -23,7 +23,7 @@ tiles = {0: Actor('blank'),
 CELL_SIZE = 30
 
 # Functions
-def build_grid(cols, rows, filler):
+def build_grid(rows, cols, filler):
     grid = []
     for ir in range(rows):
         row = []
@@ -33,14 +33,14 @@ def build_grid(cols, rows, filler):
     return grid
 
 # Add mines at random locations
-def place_mines(grid, cols, rows, mines):
+def place_mines(grid, rows, cols, mines):
     for mine in range(mines):
-        ic = random.randint(0, cols - 1)
         ir = random.randint(0, rows - 1)
+        ic = random.randint(0, cols - 1)
         # TODO: if too many mines this loop will never end.
         while grid[ir][ic] == 'M':
-            ic = random.randint(0, cols - 1)
             ir = random.randint(0, rows - 1)
+            ic = random.randint(0, cols - 1)
         grid[ir][ic] = 'M'
     return grid
 
@@ -134,14 +134,14 @@ COLS = 10
 MINES = 10
 
 # Pygamezero will set the the screen based on the globals WIDTH and HEIGHT
-WIDTH = ((COLS * CELL_SIZE) + 1)
 HEIGHT = ((ROWS * CELL_SIZE) + 1)
+WIDTH = ((COLS * CELL_SIZE) + 1)
 
 # top_grid holds blanks or flags
-top_grid  = build_grid(COLS, ROWS, 1)
+top_grid  = build_grid(ROWS, COLS, 1)
 
 # base_grid holds mines/numeber of adjacent/or blanks
 # it is buil in three steps.
-base_grid = build_grid(COLS, ROWS, 0)
-base_grid = place_mines(base_grid, COLS, ROWS, MINES)
+base_grid = build_grid(ROWS, COLS, 0)
+base_grid = place_mines(base_grid, ROWS, COLS, MINES)
 base_grid = count_mines(base_grid)
