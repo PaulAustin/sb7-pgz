@@ -25,24 +25,24 @@ CELL_SIZE = 30
 # Functions
 def build_grid(rows, cols, filler):
     grid = []
-    for ir in range(rows):
+    for r in range(rows):
         row = []
-        for ic in range(cols):
+        for c in range(cols):
             row.append(filler)
         grid.append(row)
     return grid
 
 # Add mines at random locations
 def place_mines(grid, rows, cols, mines):
-    for mine in range(mines):
-        ir = random.randint(0, rows - 1)
-        ic = random.randint(0, cols - 1)
-        # TODO: if too many mines this loop will never end.
-        while grid[ir][ic] == 'M':
-            ir = random.randint(0, rows - 1)
-            ic = random.randint(0, cols - 1)
-        grid[ir][ic] = 'M'
-    return grid
+    while mines > 0:
+        r = random.randint(0, rows - 1)
+        c = random.randint(0, cols - 1)
+        if grid[r][c] != 'M' :
+            grid[r][c] = 'M'
+            mines -= 1
+        else:
+            continue
+    return
 
 # For each cell if it is not a mine count how many mines are near by
 def count_mines(grid):
@@ -58,7 +58,7 @@ def count_mines(grid):
                             grid[y][x] += 1
                     except:
                         pass
-    return grid
+    return
 
 # Update the board.
 def draw():
@@ -143,5 +143,5 @@ top_grid  = build_grid(ROWS, COLS, 1)
 # base_grid holds mines/numeber of adjacent/or blanks
 # it is buil in three steps.
 base_grid = build_grid(ROWS, COLS, 0)
-base_grid = place_mines(base_grid, ROWS, COLS, MINES)
-base_grid = count_mines(base_grid)
+place_mines(base_grid, ROWS, COLS, MINES)
+count_mines(base_grid)
