@@ -75,9 +75,9 @@ def count_mines(grid):
 # Increment all mine neighbors
 def inc_neighbors(grid, r, c):
     # Inc all cells net to the mine
-    for n in list_of_neighbors(grid, r, c) :
-        if grid[n[0]][n[1]] != 'M':
-            grid[n[0]][n[1]] += 1
+    for r, c in list_of_neighbors(grid, r, c) :
+        if grid[r][c] != 'M':
+            grid[r][c] += 1
     return
 
 # Update the board.
@@ -105,47 +105,47 @@ def draw():
     return
 
 def on_mouse_down(pos, button):
-    col = math.floor(pos[0]/CELL_SIZE)
-    row = math.floor(pos[1]/CELL_SIZE)
+
+    # map x y pixel location to row/col in grid
+    r = math.floor(pos[1]/CELL_SIZE)
+    c = math.floor(pos[0]/CELL_SIZE)
+
     if button == mouse.LEFT:
         # Left click tests cell
-        if top_grid[row][col] != 'F':
-            top_grid[row][col] = 0
-            if base_grid[row][col] == 0:
-                edge_detection(base_grid, (col, row))
+        if top_grid[r][c] != 'F':
+            top_grid[r][c] = 0
+            if base_grid[r][c] == 0:
+                test_region(base_grid, (r, c))
+            elif base_grid[r][c] == 'M' :
+                print("sunk your battleship")
     else:
         # Right/Center click adds flag
-        if top_grid[row][col] == 1:
-            top_grid[row][col] = 'F'
-        elif top_grid[row][col] == 'F':
-            top_grid[row][col] = 1
+        if top_grid[r][c] == 1:
+            top_grid[r][c] = 'F'
+        elif top_grid[r][c] == 'F':
+            top_grid[r][c] = 1
 
-def edge_detection(grid, gridpos):
-    # Make a queue of zeros to look at begining with a
-    # seed point, vistin neighbors and add to the queue
-    zeros = [gridpos]
-    past_zeros = []
-    for zero in zeros:
-        top_grid[zero[1]][zero[0]] = 0
-        x, y = zero
-        neighbors = [(x - 1, y - 1), (x    , y - 1), (x + 1, y - 1),
-                     (x - 1, y    ),                 (x + 1, y    ),
-                     (x - 1, y + 1), (x    , y + 1), (x + 1, y + 1)]
-        for nx, ny in neighbors:
-            try:
-                if ny >= 0 and nx >= 0:
-                    if grid[ny][nx] == 0 and top_grid[ny][nx] == 1:
-                        if top_grid[ny][nx] != 'F':
-                            top_grid[ny][nx] = 0
-                        if (nx, ny) not in zeros:
-                            zeros.append((nx, ny))
-                    else:
-                        if top_grid[ny][nx] != 'F':
-                            top_grid[ny][nx] = 0
+def test_region(grid, seedpos):
+    # Make a queue of cleared cells to look at begining with
+    # the seed point, visit neighbors and add to the queue
+    zcells = [seedpos]
+    for r, c in zcells:
+        neighbors = list_of_neighbors(grid, r, c)
+        for nr, nc in neighbors:
+            if grid[nr][nc] == 0 and top_grid[nr][nc] == 1 :
+                # If this cell has no near mines and
+                # and it is still hidden, then..
+                if top_grid[nr][nc] != 'F':
+                    # Not a flag, reove cover
+                    top_grid[nr][nc] = 0
 
-            except:
-                pass
-    return top_grid
+                if (nr, nc) not in zcells:
+                    zcells.append((nr, nc))
+
+            elif top_grid[nr][nc] != 'F':
+                # Show the count on the edge the area cleared
+                top_grid[nr][nc] = 0
+    return
 
 # Basic game parameters
 ROWS = 10
