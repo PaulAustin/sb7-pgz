@@ -51,6 +51,17 @@ def place_mines(grid, rows, cols, mines):
     # return True if all placed.
     return mines == 0
 
+
+# Build a list neighbors omitting ones off the edge
+def list_of_neighbors(grid, r, c):
+    neighbors = []
+    for rn in range(max(0,r-1), min(r+2,len(grid))):
+        for cn in range(max(0,c-1), min(c+2,len(grid[0]))):
+            if rn != r or cn != c :
+                # Ignore the center, append all others
+                neighbors.append((rn,cn))
+    return neighbors
+
 # For each cell if it is not a mine count how many mines are nearby
 def count_mines(grid):
     # For each cell that has a mine, increment the cells around it.
@@ -63,13 +74,10 @@ def count_mines(grid):
 
 # Increment all mine neighbors
 def inc_neighbors(grid, r, c):
-    # Inc the 3x3 grid centered about the mine
-    # Watch out for edges. The center will be
-    # skipped since it is a mine as well.
-    for rn in range(max(0,r-1), min(r+2,len(grid))):
-        for cn in range(max(0,c-1), min(c+2,len(grid[0]))):
-            if grid[rn][cn] != 'M':
-                grid[rn][cn] += 1
+    # Inc all cells net to the mine
+    for n in list_of_neighbors(grid, r, c) :
+        if grid[n[0]][n[1]] != 'M':
+            grid[n[0]][n[1]] += 1
     return
 
 # Update the board.
@@ -104,7 +112,7 @@ def on_mouse_down(pos, button):
         if top_grid[row][col] != 'F':
             top_grid[row][col] = 0
             if base_grid[row][col] == 0:
-                edge_detection((col, row), base_grid)
+                edge_detection(base_grid, (col, row))
     else:
         # Right/Center click adds flag
         if top_grid[row][col] == 1:
@@ -112,7 +120,9 @@ def on_mouse_down(pos, button):
         elif top_grid[row][col] == 'F':
             top_grid[row][col] = 1
 
-def edge_detection(gridpos, grid):
+def edge_detection(grid, gridpos):
+    # Make a queue of zeros to look at begining with a
+    # seed point, vistin neighbors and add to the queue
     zeros = [gridpos]
     past_zeros = []
     for zero in zeros:
