@@ -76,28 +76,25 @@ def inc_neighbors(grid, r, c):
 def draw():
     offset = -CELL_SIZE/2
     xpos, ypos = offset, offset
-    for row in range(len(base_grid)):
-        ypos += CELL_SIZE
-        xpos = offset
-        for col in range(len(base_grid[0])):
-            xpos += CELL_SIZE
-            gridpos = base_grid[row][col]
-            tiles[gridpos].pos = xpos, ypos
-            tiles[gridpos].draw()
-
-    xpos, ypos = offset, offset
     for row in range(len(top_grid)):
         ypos += CELL_SIZE
         xpos = offset
         for col in range(len(top_grid[0])):
             xpos += CELL_SIZE
             if top_grid[row][col] == 1:
+                # Its still hidden
                 cover.pos = xpos, ypos
                 cover.draw()
             elif top_grid[row][col] == 'F':
+                # Its a flag
                 flag.pos = xpos, ypos
                 flag.draw()
-
+            else:
+                # top is gone, show the base layer
+                gridpos = base_grid[row][col]
+                tiles[gridpos].pos = xpos, ypos
+                tiles[gridpos].draw()
+    return
 
 def on_mouse_down(pos, button):
     col = math.floor(pos[0]/CELL_SIZE)
