@@ -93,16 +93,18 @@ def draw():
 
 def on_mouse_down(pos, button):
     mousepos = (floor(pos[0]/30), floor(pos[1]/30))
+    xcell = floor(pos[0]/30)
+    ycell = floor(pos[1]/30)
     if button == mouse.LEFT:
-        if top_grid[mousepos[1]][mousepos[0]] != 'F':
-            top_grid[mousepos[1]][mousepos[0]] = 0
-            if base_grid[mousepos[1]][mousepos[0]] == 0:
+        if top_grid[ycell][xcell] != 'F':
+            top_grid[ycell][xcell] = 0
+            if base_grid[ycell][xcell] == 0:
                 edge_detection((floor(pos[0]/30), floor(pos[1]/30)), base_grid)
     else:
-        if top_grid[mousepos[1]][mousepos[0]] == 1:
-            top_grid[mousepos[1]][mousepos[0]] = 'F'
-        elif top_grid[mousepos[1]][mousepos[0]] == 'F':
-            top_grid[mousepos[1]][mousepos[0]] = 1
+        if top_grid[ycell][xcell] == 1:
+            top_grid[ycell][xcell] = 'F'
+        elif top_grid[ycell][xcell] == 'F':
+            top_grid[ycell][xcell] = 1
 
 def edge_detection(gridpos, grid):
     zeros = [gridpos]
