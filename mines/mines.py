@@ -22,7 +22,12 @@ tiles = {0: Actor('blank'),
 # Game Setup
 CELL_SIZE = 30
 
-# Functions
+# Basic game parameters
+ROWS = 10
+COLS = 10
+MINES = 10
+
+# Build a list of lists
 def build_grid(rows, cols, filler):
     grid = []
     for r in range(rows):
@@ -74,7 +79,7 @@ def count_mines(grid):
 
 # Increment all mine neighbors
 def inc_neighbors(grid, r, c):
-    # Inc all cells net to the mine
+    # Inc all cells next to the mine
     for r, c in list_of_neighbors(grid, r, c) :
         if grid[r][c] != 'M':
             grid[r][c] += 1
@@ -146,11 +151,6 @@ def test_region(grid, seedpos):
                 # Show the count on the edge the area cleared
                 top_grid[nr][nc] = 0
     return
-
-# Basic game parameters
-ROWS = 10
-COLS = 10
-MINES = 10
 
 # Pygamezero will set the the screen based on the globals WIDTH and HEIGHT
 HEIGHT = ((ROWS * CELL_SIZE) + 1)
