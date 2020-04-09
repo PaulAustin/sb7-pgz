@@ -4,11 +4,11 @@ import random
 import math
 
 # Create the top tiles
-cover = Actor('cover')
-flag  = Actor('flag')
+COVER = Actor('cover')
+FLAG  = Actor('flag')
 
 # Create a dictionary that stores all the possible bottom tile types
-tiles = {0: Actor('blank'),
+TILES = {0: Actor('blank'),
          1: Actor('one'),
          2: Actor('two'),
          3: Actor('three'),
@@ -96,17 +96,17 @@ def draw():
             xpos += CELL_SIZE
             if top_grid[row][col] == 1:
                 # Its still hidden
-                cover.pos = xpos, ypos
-                cover.draw()
+                COVER.pos = xpos, ypos
+                COVER.draw()
             elif top_grid[row][col] == 'F':
                 # Its a flag
-                flag.pos = xpos, ypos
-                flag.draw()
+                FLAG.pos = xpos, ypos
+                FLAG.draw()
             else:
                 # top is gone, show the base layer
                 gridpos = base_grid[row][col]
-                tiles[gridpos].pos = xpos, ypos
-                tiles[gridpos].draw()
+                TILES[gridpos].pos = xpos, ypos
+                TILES[gridpos].draw()
     return
 
 def on_mouse_down(pos, button):
@@ -142,7 +142,7 @@ def flood_fill(grid, seedpos):
                 # If this cell has no near mines and
                 # and it is still hidden, then..
                 if top_grid[nr][nc] != 'F':
-                    # Not a flag, reove cover
+                    # Not a flag, remove cover
                     top_grid[nr][nc] = 0
 
                 if (nr, nc) not in zcells:
