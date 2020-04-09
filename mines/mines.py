@@ -23,8 +23,8 @@ tiles = {0: Actor('blank'),
 CELL_SIZE = 30
 
 # Basic game parameters
-ROWS = 10
-COLS = 10
+ROWS = 15
+COLS = 15
 MINES = 10
 
 # Build a list of lists
@@ -38,14 +38,14 @@ def build_grid(rows, cols, filler):
     return grid
 
 # Add mines at random locations
-def place_mines(grid, rows, cols, mines):
+def place_mines(grid, mines):
     # Attempt to place n mines, if one already placed
     # try again, but only so many attempts
     # loop will alwasy exit.
-    max_tries = rows * cols * 2
+    max_tries = len(grid) * len(grid[0]) * 2
     while mines > 0 and max_tries > 0 :
-        r = random.randint(0, rows - 1)
-        c = random.randint(0, cols - 1)
+        r = random.randint(0, len(grid) - 1)
+        c = random.randint(0, len(grid[0]) - 1)
         if grid[r][c] != 'M' :
             grid[r][c] = 'M'
             mines -= 1
@@ -120,9 +120,10 @@ def on_mouse_down(pos, button):
         if top_grid[r][c] != 'F':
             top_grid[r][c] = 0
             if base_grid[r][c] == 0:
-                test_region(base_grid, (r, c))
+                flood_fill(base_grid, (r, c))
             elif base_grid[r][c] == 'M' :
                 print("sunk your battleship")
+                # PLay a sound of a sin skip
     else:
         # Right/Center click adds flag
         if top_grid[r][c] == 1:
@@ -130,7 +131,7 @@ def on_mouse_down(pos, button):
         elif top_grid[r][c] == 'F':
             top_grid[r][c] = 1
 
-def test_region(grid, seedpos):
+def flood_fill(grid, seedpos):
     # Make a queue of cleared cells to look at begining with
     # the seed point, visit neighbors and add to the queue
     zcells = [seedpos]
@@ -162,5 +163,5 @@ top_grid  = build_grid(ROWS, COLS, 1)
 # base_grid holds mines/numeber of adjacent/or blanks
 # it is buil in three steps.
 base_grid = build_grid(ROWS, COLS, 0)
-place_mines(base_grid, ROWS, COLS, MINES)
+place_mines(base_grid, MINES)
 count_mines(base_grid)
