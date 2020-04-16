@@ -1,18 +1,16 @@
 import random
-import copy
 
 ROWS = 50
-COLS = 100
+COLS = 80
 CELL_SIZE = 10
 BACK_COLOR = 255, 255, 255
 CELL_COLOR = 0, 200, 0
 
-HEIGHT = ((ROWS+5) * CELL_SIZE)
-WIDTH = ((COLS+5) * CELL_SIZE)
-
-world = list()
+HEIGHT = (ROWS * CELL_SIZE)
+WIDTH = (COLS * CELL_SIZE)
 
 def init_lives(rows, cols):
+    grid = []
     for r in range(rows):
         row = []
         for c in range(cols):
@@ -20,7 +18,8 @@ def init_lives(rows, cols):
             row.append(random.randint(0, 7) == 0)
 
         # Build the world one row at a time.
-        world.append(row)
+        grid.append(row)
+    return grid
 
 def draw_cell(r, c):
     cx = CELL_SIZE * c
@@ -30,37 +29,47 @@ def draw_cell(r, c):
     return;
 
 def draw():
+    screen.clear()
     for r in range(ROWS):
         for c in range(COLS):
             if world[r][c]:
                 draw_cell(r, c)
 
-def count_neighbors(r, c):
+def count_neighbors(w, r, c):
     # count the 3x3 grid, subtrct the middle
     # trims off the edges if next to the edge of the world
     sum = 0
-    for i in range(max(r-1,0), min(r+1,ROWS-1)+1):
-        for j in range(max(c-1,0), min(c+1,COLS-1)+1):
-            if world[i][j]:
+    for nr in range(max(r-1,0), min(r+1,ROWS-1) + 1):
+        for nc in range(max(c-1,0), min(c+1,COLS-1) + 1):
+            if w[nr][nc]:
                 sum += 1
-    if world[r][c]:
+    if w[r][c]:
         sum -= 1
     return sum
 
 def update():
-    global world
-    screen.clear()
-    newlife = copy.deepcopy(world) # make a copy of life
+    global worldNext, world
+
+    # Calculate the next state
     for r in range(ROWS):
         for c in range(COLS):
-            k = count_neighbors(r, c)
-            if k < 2 or k > 3:
-                newlife[r][c] = False
-            elif k == 3:
-                newlife[r][c] = True
-    world = copy.deepcopy(newlife) # copy back to life
+            n = count_neighbors(world, r, c)
+            if world[r][c]:
+                worldNext[r][c] = (n == 2 or n == 3)
+            else:
+                worldNext[r][c] = (n == 3)
+
+    # Move the next state back to the main grid
+    for r in range(ROWS):
+        for c in range(COLS):
+            world[r][c] = worldNext[r][c]
+
 
 def on_mouse_down(pos, button):
     print (" on mouse down")
 
-init_lives(ROWS, COLS)
+world = init_lives(ROWS, COLS)
+worldNext = init_lives(ROWS, COLS)
+
+
+
