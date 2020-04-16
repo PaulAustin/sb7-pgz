@@ -3,11 +3,11 @@ import random
 ROWS = 50
 COLS = 80
 CELL_SIZE = 10
-BACK_COLOR = 255, 255, 255
-CELL_COLOR = 0, 200, 0
-
 HEIGHT = (ROWS * CELL_SIZE)
 WIDTH = (COLS * CELL_SIZE)
+
+BACK_COLOR = 255, 255, 255
+CELL_COLOR = (0, 200, 0)
 
 def init_lives(rows, cols):
     grid = []
@@ -55,8 +55,10 @@ def update():
         for c in range(COLS):
             n = count_neighbors(world, r, c)
             if world[r][c]:
-                worldNext[r][c] = (n == 2 or n == 3)
+                # Live cell stays alive if not lonely or crowded
+                worldNext[r][c] = (n >= 2 and  n <= 3)
             else:
+                # Open cell springs to life if three nearby
                 worldNext[r][c] = (n == 3)
 
     # Move the next state back to the main grid
