@@ -1,18 +1,28 @@
+# Conway's game of life
+# uses pygamezero frame work
+#
+# See key event at end for commands
+#
+
 import random
 
 ROWS = 50
-COLS = 80
+COLS = 70
 CELL_SIZE = 10
 HEIGHT = (ROWS * CELL_SIZE)
 WIDTH = (COLS * CELL_SIZE)
 
 BACK_COLOR = 255, 255, 255
-CELL_COLOR = (0, 200, 0)
+CELL_COLOR = (200, 0, 200)
 
 g_changed = False
 g_delay = 0
 g_tics  = 0
-g_paused = False
+g_running = True
+g_step = False
+
+def grid_build(rows, cols):
+    return [[False for c in range(cols)] for r in range(rows)]
 
 def grid_clear(grid):
     for r in range(len(grid)):
@@ -23,9 +33,6 @@ def grid_random(grid):
     for r in range(len(grid)):
         for c in range(len(grid[0])):
             grid[r][c] = random.randint(0, 7) == 0
-
-def grid_build(rows, cols):
-    return [[False for c in range(cols)] for r in range(rows)]
 
 def draw_cell(r, c):
     cx = CELL_SIZE * c
@@ -60,9 +67,12 @@ def count_neighbors(w, r, c):
     return sum
 
 def update():
-    global g_changed
-    if g_paused:
+    # Look at globals that control the speed
+    global g_running, g_changed, g_step
+    if not g_running:
         return
+    if g_step:
+        g_running = False
     g_changed = True
 
     # Calculate the next state
@@ -88,14 +98,24 @@ def on_mouse_down(pos, button):
     world[r][c] = not world[r][c]
     g_changed = True
 
-def on_key_down(key,mod,unicode):
-    global g_paused
+def on_key_down(key, mod, unicode):
+    global g_running, g_step, g_changed
     if (key == keys.SPACE):
-        g_paused = not g_paused
+        # Freez / thaw the clock of life
+        g_running = not g_running
+        g_step = False
     if (key == keys.C):
+        # Clear the world
         grid_clear(world)
+        g_changed = True
     if (key == keys.R):
+        # Seed world wiht random values
         grid_random(world)
+        g_changed = True
+    if (key == keys.S):
+        # Make a a single generaion step
+        g_running = True
+        g_step = True
 
 world = grid_build(ROWS, COLS)
 grid_random(world)
