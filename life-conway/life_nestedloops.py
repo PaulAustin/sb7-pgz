@@ -6,9 +6,9 @@
 
 import random
 
-ROWS = 50
-COLS = 70
-CELL_SIZE = 10
+ROWS = 100
+COLS = 140
+CELL_SIZE = 5
 HEIGHT = (ROWS * CELL_SIZE)
 WIDTH = (COLS * CELL_SIZE)
 
