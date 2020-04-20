@@ -16,8 +16,6 @@ BACK_COLOR = 255, 255, 255
 CELL_COLOR = (200, 0, 200)
 
 g_changed = False
-g_delay = 0
-g_tics  = 0
 g_running = True
 g_step = False
 
