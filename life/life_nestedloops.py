@@ -6,23 +6,27 @@
 
 import random
 
-ROWS = 100
+ROWS = 65
 COLS = 140
 CELL_SIZE = 5
 HEIGHT = (ROWS * CELL_SIZE)
 WIDTH = (COLS * CELL_SIZE)
 
-BACK_COLOR = 255, 255, 255
-CELL_COLOR = (200, 0, 200)
+BACK_COLOR = (0, 0, 127)
+CELL_COLOR = (0, 255, 0)
 
 g_changed = False
-g_delay = 0
-g_tics  = 0
 g_running = True
 g_step = False
 
 def grid_build(rows, cols):
-    return [[False for c in range(cols)] for r in range(rows)]
+    grid = []
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            row.append(False)
+        grid.append(row)
+    return grid
 
 def grid_clear(grid):
     for r in range(len(grid)):
@@ -47,7 +51,7 @@ def draw():
         return
     g_changed = False
 
-    screen.clear()
+    screen.fill(BACK_COLOR)
     for r in range(ROWS):
         for c in range(COLS):
             if world[r][c]:
