@@ -1,19 +1,21 @@
 # Conway's game of life
 # uses pygamezero frame work
 #
-# See key event at end for commands
+# See key event handler at end for commands
 #
 
 import random
 
-ROWS = 65
+# Game setup
+ROWS = 100
 COLS = 140
 CELL_SIZE = 5
-HEIGHT = (ROWS * CELL_SIZE)
-WIDTH = (COLS * CELL_SIZE)
-
 BACK_COLOR = (0, 0, 127)
 CELL_COLOR = (0, 255, 0)
+
+# The globals HEIGHT & WIDTH are used by pygamezero
+HEIGHT = (ROWS * CELL_SIZE)
+WIDTH = (COLS * CELL_SIZE)
 
 g_changed = False
 g_running = True
@@ -38,7 +40,7 @@ def grid_random(grid):
         for c in range(len(grid[0])):
             grid[r][c] = random.randint(0, 7) == 0
 
-def draw_cell(r, c):
+def cell_draw(r, c):
     cx = CELL_SIZE * c
     cy = CELL_SIZE * r
     cell_rect = Rect((cx, cy), (CELL_SIZE, CELL_SIZE))
@@ -52,13 +54,13 @@ def draw():
     g_changed = False
 
     screen.fill(BACK_COLOR)
-    for r in range(ROWS):
-        for c in range(COLS):
-            if world[r][c]:
-                draw_cell(r, c)
+    for r in range(len(g_world)):
+        for c in range(len(g_world[0])):
+            if g_world[r][c]:
+                cell_draw(r, c)
 
 def count_neighbors(w, r, c):
-    # count the 3x3 grid, subtrct the middle
+    # count the 3x3 grid, subtract the middle
     # trims off the edges if next to the edge of the world
     sum = 0
     for nr in range(max(r-1,0), min(r+1,ROWS-1) + 1):
@@ -82,48 +84,46 @@ def update():
     # Calculate the next state
     for r in range(ROWS):
         for c in range(COLS):
-            n = count_neighbors(world, r, c)
-            if world[r][c]:
+            n = count_neighbors(g_world, r, c)
+            if g_world[r][c]:
                 # Live cell stays alive if not lonely or crowded
-                worldNext[r][c] = (n >= 2 and  n <= 3)
+                g_worldNext[r][c] = (n >= 2 and  n <= 3)
             else:
                 # Open cell springs to life if three nearby
-                worldNext[r][c] = (n == 3)
+                g_worldNext[r][c] = (n == 3)
 
     # Move the next state back to the main grid
     for r in range(ROWS):
         for c in range(COLS):
-            world[r][c] = worldNext[r][c]
+            g_world[r][c] = g_worldNext[r][c]
 
 def on_mouse_down(pos, button):
     global g_changed
     r = pos[1] // CELL_SIZE
     c = pos[0] // CELL_SIZE
-    world[r][c] = not world[r][c]
+    g_world[r][c] = not g_world[r][c]
     g_changed = True
 
 def on_key_down(key, mod, unicode):
     global g_running, g_step, g_changed
     if (key == keys.SPACE):
-        # Freez / thaw the clock of life
+        # Freeze / thaw the clock of life
         g_running = not g_running
         g_step = False
     if (key == keys.C):
         # Clear the world
-        grid_clear(world)
+        grid_clear(g_world)
         g_changed = True
     if (key == keys.R):
-        # Seed world wiht random values
-        grid_random(world)
+        # Seed world with random values
+        grid_random(g_world)
         g_changed = True
     if (key == keys.S):
         # Make a a single generaion step
         g_running = True
         g_step = True
 
-world = grid_build(ROWS, COLS)
-grid_random(world)
-worldNext = grid_build(ROWS, COLS)
-
-
-
+# Initialize the game then let pygamezero run the program
+g_world = grid_build(ROWS, COLS)
+grid_random(g_world)
+g_worldNext = grid_build(ROWS, COLS)
