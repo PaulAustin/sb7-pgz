@@ -12,8 +12,8 @@ CELL_SIZE = 10
 HEIGHT = (ROWS * CELL_SIZE)
 WIDTH = (COLS * CELL_SIZE)
 
-BACK_COLOR = 255, 255, 255
-CELL_COLOR = (200, 0, 200)
+BACK_COLOR = (0, 0, 127)
+CELL_COLOR = (0, 200, 0)
 
 g_changed = False
 g_running = True
@@ -33,7 +33,7 @@ def grid_random(grid):
 def grid_clear(grid):
     grid_apply(grid, lambda : False)
 
-def draw_cell(r, c):
+def cell_draw(r, c):
     cx = CELL_SIZE * c
     cy = CELL_SIZE * r
     cell_rect = Rect((cx, cy), (CELL_SIZE, CELL_SIZE))
@@ -46,8 +46,8 @@ def draw():
         return
     g_changed = False
 
-    screen.clear()
-    grid_apply(world, lambda r,c : (draw_cell(r, c) if world[r][c] else False))
+    screen.fill(BACK_COLOR)
+    grid_apply(world, lambda r,c : (cell_draw(r, c) if world[r][c] else False))
 
 def count_neighbors(w, r, c):
     # count the 3x3 grid, subtrct the middle
@@ -95,7 +95,7 @@ def on_mouse_down(pos, button):
 def on_key_down(key, mod, unicode):
     global g_running, g_step, g_changed
     if (key == keys.SPACE):
-        # Freez / thaw the clock of life
+        # Freeze / thaw the clock of life
         g_running = not g_running
         g_step = False
     if (key == keys.C):
