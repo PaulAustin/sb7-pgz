@@ -5,8 +5,11 @@ CELL_COLOR = (0, 200, 0)
 HEIGHT = 200
 WIDTH = 400
 
-dog = Actor('dog2_100x100', (200,100))
-ball = Actor('ball_100x100', (200,100))
+DOG  = 'dog2_100x100'
+BALL = 'ball_100x100'
+
+dog = Actor(BALL, (200,100))
+ball = Actor(DOG, (200,100))
 
 def draw():
     screen.fill(BACK_COLOR)
