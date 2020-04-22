@@ -22,23 +22,23 @@ g_step = False
 def grid_build(rows, cols):
     return [[False for c in range(cols)] for r in range(rows)]
 
-def grid_apply(grid, func):
+def apply(grid, func):
     for r in range(len(grid)):
-        for c in range(len(grid[0])):
+        for c in range(len(grid[r])):
             grid[r][c] = func(r, c)
 
 def grid_random(grid):
-    grid_apply(grid, lambda r,c : (random.randint(0, 7) == 0))
+    apply(grid, lambda r, c : (random.randint(0, 7) == 0))
 
 def grid_clear(grid):
-    grid_apply(grid, lambda : False)
+    apply(grid, lambda : False)
 
 def cell_draw(r, c):
     cx = CELL_SIZE * c
     cy = CELL_SIZE * r
     cell_rect = Rect((cx, cy), (CELL_SIZE, CELL_SIZE))
     screen.draw.filled_rect(cell_rect, CELL_COLOR)
-    return True;
+    return True
 
 def draw():
     global g_changed
@@ -47,26 +47,24 @@ def draw():
     g_changed = False
 
     screen.fill(BACK_COLOR)
-    grid_apply(world, lambda r,c : (cell_draw(r, c) if world[r][c] else False))
+    apply(world, lambda r, c : (cell_draw(r, c) if world[r][c] else False))
 
 def count_neighbors(w, r, c):
     # count the 3x3 grid, subtrct the middle
     # trims off the edges if next to the edge of the world
-    sum = 0
-    for nr in range(max(r-1,0), min(r+1,ROWS-1) + 1):
-        for nc in range(max(c-1,0), min(c+1,COLS-1) + 1):
+    sum = -1 if w[r][c] else 0
+    for nr in range(max(r-1, 0), min(r+1, ROWS-1) + 1):
+        for nc in range(max(c-1, 0), min(c+1, COLS-1) + 1):
             if w[nr][nc]:
                 sum += 1
     # Loop above added the center cell, subtract it back out.
-    if w[r][c]:
-        sum -= 1
     return sum
 
 def next_cell(current_world, r, c):
     n = count_neighbors(current_world, r, c)
     if current_world[r][c]:
         # Live cell stays alive if not lonely or crowded
-        return (n >= 2 and  n <= 3)
+        return (n >= 2 and n <= 3)
     else:
         # Open cell springs to life if three nearby
         return (n == 3)
@@ -81,9 +79,8 @@ def update():
     g_changed = True
 
     # Calculate the next state, then copy back
-    grid_apply(worldNext, lambda r,c : next_cell(world, r, c))
-    grid_apply(world, lambda r,c : worldNext[r][c])
-
+    apply(worldNext, lambda r, c : next_cell(world, r, c))
+    apply(world, lambda r, c : worldNext[r][c])
 
 def on_mouse_down(pos, button):
     global g_changed

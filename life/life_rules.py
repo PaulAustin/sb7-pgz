@@ -18,15 +18,15 @@ CELL_COLOR = (0, 200, 0)
 XXX = True
 OOO = False
 #         How many neighboring cells
-#          0   1   2   3   4   5   6   7   8
+#            0   1   2   3   4   5   6   7   8
 # Classic rules
-#WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
-#STAYUP = [OOO,OOO,XXX,XXX,OOO,OOO,OOO,OOO,OOO]
+# WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
+# STAYUP = [OOO,OOO,XXX,XXX,OOO,OOO,OOO,OOO,OOO]
 
 # Some others
 # mazish
-#WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
-#STAYUP = [OOO,OOO,XXX,XXX,XXX,OOO,OOO,OOO,OOO]
+# WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
+# STAYUP = [OOO,OOO,XXX,XXX,XXX,OOO,OOO,OOO,OOO]
 
 def Rule(rule):
     return [(b != '_') for b in rule]
@@ -57,23 +57,23 @@ g_step = False
 def grid_build(rows, cols):
     return [[False for c in range(cols)] for r in range(rows)]
 
-def grid_apply(grid, func):
+def apply(grid, func):
     for r in range(len(grid)):
-        for c in range(len(grid[0])):
+        for c in range(len(grid[r])):
             grid[r][c] = func(r, c)
 
 def grid_random(grid):
-    grid_apply(grid, lambda r, c : (random.randint(0, 7) == 0))
+    apply(grid, lambda r, c : (random.randint(0, 7) == 0))
 
 def grid_clear(grid):
-    grid_apply(grid, lambda r, c : False)
+    apply(grid, lambda r, c : False)
 
 def cell_draw(r, c):
     cx = CELL_SIZE * c
     cy = CELL_SIZE * r
     cell_rect = Rect((cx, cy), (CELL_SIZE, CELL_SIZE))
     screen.draw.filled_rect(cell_rect, CELL_COLOR)
-    return True;
+    return True
 
 def draw():
     global g_changed
@@ -82,14 +82,14 @@ def draw():
     g_changed = False
 
     screen.fill(BACK_COLOR)
-    grid_apply(world, lambda r,c : (cell_draw(r, c) if world[r][c] else False))
+    apply(world, lambda r, c : (cell_draw(r, c) if world[r][c] else False))
 
 def count_neighbors(w, r, c):
     # Count the 3x3 grid, subtract the middle and
     # trim off the edges if next to the edge of the world
     sum = 0
-    for nr in range(max(r-1,0), min(r+1,ROWS-1) + 1):
-        for nc in range(max(c-1,0), min(c+1,COLS-1) + 1):
+    for nr in range(max(r-1, 0), min(r+1, ROWS-1) + 1):
+        for nc in range(max(c-1, 0), min(c+1, COLS-1) + 1):
             if w[nr][nc]:
                 sum += 1
     # Loop above added the center cell, subtract it back out.
@@ -111,8 +111,8 @@ def update():
     g_changed = True
 
     # Calculate the next state, then copy back
-    grid_apply(worldNext, lambda r,c : next_cell(world, r, c))
-    grid_apply(world, lambda r,c : worldNext[r][c])
+    apply(worldNext, lambda r, c : next_cell(world, r, c))
+    apply(world, lambda r, c : worldNext[r][c])
 
 def on_mouse_down(pos, button):
     global g_changed

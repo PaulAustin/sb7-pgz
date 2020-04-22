@@ -17,13 +17,13 @@ KEEPUP = Rule('__XX_____')
 def grid_build(rows, cols):
     return [[False for c in range(cols)] for r in range(rows)]
 
-def grid_apply(grid, func):
+def apply(grid, func):
     for r in range(len(grid)):
-        for c in range(len(grid[0])):
+        for c in range(len(grid[r])):
             grid[r][c] = func(r, c)
 
 def grid_random(grid):
-    grid_apply(grid, lambda r, c : (random.randint(0, 7) == 0))
+    apply(grid, lambda r, c : (random.randint(0, 7) == 0))
 
 def cell_draw(r, c):
     xy = (CELL_SIZE * c, CELL_SIZE * r)
@@ -33,7 +33,7 @@ def cell_draw(r, c):
 
 def draw():
     screen.fill(BACK_COLOR)
-    grid_apply(world, lambda r, c : (cell_draw(r, c) if world[r][c] else False))
+    apply(world, lambda r, c : (cell_draw(r, c) if world[r][c] else False))
 
 def count_neighbors(w, r, c):
     sum = -1 if w[r][c] else 0
@@ -49,8 +49,8 @@ def next_cell(current_world, r, c):
     return ((not up and WAKEUP[n]) or (up and KEEPUP[n]))
 
 def update():
-    grid_apply(worldNext, lambda r, c : next_cell(world, r, c))
-    grid_apply(world, lambda r, c : worldNext[r][c])
+    apply(worldNext, lambda r, c : next_cell(world, r, c))
+    apply(world, lambda r, c : worldNext[r][c])
 
 world = grid_build(ROWS, COLS)
 grid_random(world)
