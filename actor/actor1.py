@@ -1,18 +1,16 @@
 # Example using pygame-zero actor object
-import pgzero
-print(pgzero.__version__)
 
 BACK_COLOR = (200, 220, 255)
 BACK_COLOR_CLOSE = (170, 170, 255)
-CELL_COLOR = (0, 200, 0)
 HEIGHT = 200
 WIDTH = 400
 
-DOG  = 'dog2_100x100'
+DOG1 = 'dog1_100x100'
+DOG2 = 'dog2_100x100'
 BALL = 'ball_100x100'
 
-dog = Actor(BALL, (200,100))
-ball = Actor(DOG, (200,100))
+dog = Actor(DOG2, (200,100))
+ball = Actor(BALL, (200,100))
 close = False
 
 def on_mouse_move(pos):
@@ -39,11 +37,6 @@ def draw():
 
 def update():
     if keyboard.left:
-        ball.x -= 1
+        dog.x -= 2
     elif keyboard.right:
-        ball.x += 1
-    elif keyboard.up:
-        ball.angle -= 1
-    elif keyboard.down:
-        ball.angle += 1
-
+        dog.x += 2
