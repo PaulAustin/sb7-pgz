@@ -20,6 +20,7 @@ class Game:
         self.ani_obj = None
         self.tween = "jump"
         self.jumping = False
+        self.flip_direction = 1
 
     def on_update(self):
         if keyboard.space and self.ani_obj == None:
@@ -39,13 +40,14 @@ class Game:
                 tween='linear',
                 duration = JUMP_T * 2,
                 on_finished = None,
-                angle = -360)
-
+                angle = 360 * self.flip_direction)
             sounds.bark.play()
+            self.flip_direction *= -1
 
     def on_draw(self):
         screen.fill(BACK_COLOR)
         screen.draw.text("Angle = " + str(int(self.dog.angle)),(20,20))
+        screen.draw.text("Pos = " + str(int(self.dog.pos[1])),(20,40))
         self.dog.draw()
 
     def on_ani_done(self):
