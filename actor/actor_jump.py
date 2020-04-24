@@ -18,7 +18,6 @@ class Game:
     def __init__(self):
         self.dog = Actor(DOG2, (200, GROUND_Y))
         self.ani_obj = None
-        self.tween = "jump"
         self.jumping = False
         self.flip_direction = 1
 
