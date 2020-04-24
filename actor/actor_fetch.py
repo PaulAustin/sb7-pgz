@@ -34,6 +34,6 @@ def on_mouse_down(pos, button):
         # Start dog running at 1/4 the speed
         animate(dog,
             tween= 'decelerate',
-            duration= d / 500,
+            duration= d / 100,
             on_finished= (lambda: sounds.bark.play()),
             pos= pos)
