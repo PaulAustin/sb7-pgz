@@ -27,11 +27,7 @@ ball = Actor(BALL, (100, 100))
 g_run_sim = False
 
 def sim_motion():
-    global t_last, g_run_sim
-
-    # Object roughly has location and velocity
-    # they cant both be percise the this is an rougth
-    # 100 Hz simuation
+    global t_last
 
     # use the monotonic timer to measure the real delta time
     t_now = time.monotonic()
@@ -53,11 +49,6 @@ def sim_motion():
     elif vx < 0 and x < 50 / SCALE:
         vx = -vx * BOUNCE_DAMPEN
 
-    if (abs(vy) < 0.02 and abs(vx) < 0.02):
-        g_run_sim = False
-        vx = vy = 0
-
-
     vx *= DRAG
     vy *= DRAG
     ball.posm = (x + (vx * t_delta), y + (vy * t_delta))
@@ -66,10 +57,11 @@ def sim_motion():
     # Translate meter values to pixel locations
     ball.pos = (ball.posm[0] * SCALE), (HEIGHT - ball.posm[1] * SCALE)
 
-    if (g_run_sim):
-        g_clock = clock.schedule(sim_motion, TARGET_T_DELTA)
-    else:
+    if (abs(vy) < 0.02 and abs(vx) < 0.02):
+        # Close to still, stop the sim loop
         reset_sim()
+    else:
+        clock.schedule(sim_motion, TARGET_T_DELTA)
     return
 
 def reset_sim():
@@ -108,7 +100,7 @@ def on_mouse_up(pos):
         ball.velocity = (stretch * math.cos(rad), stretch * math.sin(rad))
 
     t_last = t_drop = time.monotonic()
-    g_clock = clock.schedule(sim_motion, TARGET_T_DELTA)
+    clock.schedule(sim_motion, TARGET_T_DELTA)
 
 def on_mouse_move(pos, rel, buttons):
     if (mouse.LEFT in buttons) :
