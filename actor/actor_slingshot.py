@@ -2,32 +2,33 @@
 # working on the sling shot
 # with the pgz animation function
 
+import math
 import time
 
 BACK_COLOR = (200, 225, 255)
+DOT_COLOR = (0, 0, 0)
+SLING_COLOR = (0, 255, 0)
 HEIGHT = 400
 WIDTH = 800
 BALL = 'ball_100x100'
 DOG2 = 'dog2_100x100'
+BOUNCE_DAMPEN = 0.70
+AIR_DAMPEN = 0.99
+SPRING_FACTOR = 8.0
+
+DOT_POS = (200, 200)
 
 GRAVITY = -9.81   # meters / seconds^2
 SCALE   = 100.0   # 100px  / meter
 DRAG    = 1.0
 TARGET_T_DELTA = 0.01
 
-INITIAL_VELOCITY = (0.0,0.0)     # in m/s - clean drop for starters
 ball = Actor(BALL, (100, 100))
-ball.posm = (1.0, 1.0)           # position in meters
-ball.velocity = (0.0, 0.0)
-ball.accel = (0.0, GRAVITY)
-t_last = 0
-t_drop = 0
-g_clock = None
+g_run_sim = False
 
 def sim_motion():
-    global t_last, g_clock
+    global t_last, g_run_sim
 
-    keep_going = True
     # Object roughly has location and velocity
     # they cant both be percise the this is an rougth
     # 100 Hz simuation
@@ -41,13 +42,21 @@ def sim_motion():
     vx, vy = ball.velocity
     ax, ay = ball.accel
 
+    vx *= AIR_DAMPEN
+    vy *= AIR_DAMPEN
+
     if (vy < 0 and y < 0.40):
         # bounce and dampen
-        vy = -vy * 0.70
-        # print ("time till bounce", t_now - t_drop)
-        if (abs(vy) * t_delta < 1.0 / SCALE):
-            keep_going = False
-            vy = 0
+        vy = -vy * BOUNCE_DAMPEN
+    if vx > 0 and x > ((WIDTH - 50) / SCALE) :
+        vx = -vx * BOUNCE_DAMPEN
+    elif vx < 0 and x < 50 / SCALE:
+        vx = -vx * BOUNCE_DAMPEN
+
+    if (abs(vy) < 0.02 and abs(vx) < 0.02):
+        g_run_sim = False
+        vx = vy = 0
+
 
     vx *= DRAG
     vy *= DRAG
@@ -57,27 +66,47 @@ def sim_motion():
     # Translate meter values to pixel locations
     ball.pos = (ball.posm[0] * SCALE), (HEIGHT - ball.posm[1] * SCALE)
 
-    if (keep_going):
+    if (g_run_sim):
         g_clock = clock.schedule(sim_motion, TARGET_T_DELTA)
-
+    else:
+        reset_sim()
     return
+
+def reset_sim():
+    g_run_sim = False
+    ball.posm = (1.0, 1.0)           # position in meters
+    ball.velocity = (0.0, 0.0)
+    ball.accel = (0.0, GRAVITY)
+    t_last = 0
+    t_drop = 0
 
 def draw():
     screen.fill(BACK_COLOR)
     ball.draw()
-    # screen.draw.filled_circle((150,150), 20, (0,200,0))
-    # screen.draw.line((150,150),ball.pos,(0,255,0))
+    screen.draw.filled_circle(DOT_POS, 10, DOT_COLOR)
+    if (not g_run_sim):
+        screen.draw.line(DOT_POS, ball.pos, SLING_COLOR)
 
 def on_mouse_down(pos,button):
+    reset_sim()
     on_mouse_move(pos, (0,0), {button})
 
 def on_mouse_up(pos):
-    global t_last, t_drop
+    global t_last, t_drop, g_run_sim
+
+    g_run_sim = True
     ball.pos = pos
-    ball.posm = ball.pos[0]/SCALE, (HEIGHT - ball.pos[1]) / SCALE
-    ball.velocity = INITIAL_VELOCITY
+    ball.posm = ball.pos[0] / SCALE, (HEIGHT - ball.pos[1]) / SCALE
     ball.accel = (0.0, GRAVITY)
-    print("dropped from", ball.posm)
+
+    stretch = ball.distance_to(DOT_POS) / SCALE
+    rad = math.radians(ball.angle_to(DOT_POS))
+    if (stretch < 0.5):
+        ball.velocity = (0, 0)
+    else:
+        stretch *= SPRING_FACTOR
+        ball.velocity = (stretch * math.cos(rad), stretch * math.sin(rad))
+
     t_last = t_drop = time.monotonic()
     g_clock = clock.schedule(sim_motion, TARGET_T_DELTA)
 
@@ -85,3 +114,4 @@ def on_mouse_move(pos, rel, buttons):
     if (mouse.LEFT in buttons) :
         ball.pos = pos
 
+reset_sim()
