@@ -6,11 +6,13 @@
 import math
 import random
 
-HEIGHT = 500;
-WIDTH = 500;
+HEIGHT = 500
+WIDTH = 500
+MARGIN = 150
 
 NUM_BOIDS = 100
 VISUAL_RANGE = 75
+SPEED_LIMIT = 18
 
 g_boids = []
 
@@ -45,23 +47,17 @@ def avoid_others(boid):
 def match_velocity(boid):
     return
 
-def limit_speed(boid):
-    return
-
 # Constrain a boid to within the window. If it gets too close to an edge,
 # nudge it back in and reverse its direction.
 def keep_within_bounds(boid) :
-    margin = 200;
-    turnFactor = 1;
-
-    if (boid.loc.real < margin) :
-        boid.vel += turnFactor
-    if (boid.loc.real >  WIDTH - margin) :
-        boid.vel -= turnFactor
-    if (boid.loc.imag < margin) :
-        boid.vel += complex(0,turnFactor)
-    if (boid.loc.imag >  HEIGHT - margin) :
-        boid.vel -= complex(0,turnFactor)
+    if (boid.loc.real < MARGIN) :
+        boid.vel += 1+0j
+    if (boid.loc.real >  WIDTH - MARGIN) :
+        boid.vel += -1+0j
+    if (boid.loc.imag < MARGIN) :
+        boid.vel += 0+1j
+    if (boid.loc.imag >  HEIGHT - MARGIN) :
+        boid.vel += 0-1j
     return
 
 """
@@ -136,18 +132,14 @@ function matchVelocity(boid) {
   }
 }
 
-// Speed will naturally vary in flocking behavior, but real animals can't go
-// arbitrarily fast.
-function limitSpeed(boid) {
-  const speedLimit = 15;
-
-  const speed = Math.sqrt(boid.dx * boid.dx + boid.dy * boid.dy);
-  if (speed > speedLimit) {
-    boid.dx = (boid.dx / speed) * speedLimit;
-    boid.dy = (boid.dy / speed) * speedLimit;
-  }
-}
 """
+# Speed will naturally vary in flocking behavior,
+# but real animals can't go arbitrarily fast.
+def limit_speed(boid) :
+    speed = abs(boid.vel)
+    if (speed > SPEED_LIMIT) :
+        boid.vel = boid.vel / speed * SPEED_LIMIT
+    return
 
 def draw_boid(boid):
   # could make actor image
