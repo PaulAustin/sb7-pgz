@@ -14,6 +14,8 @@ NUM_BOIDS = 100
 VISUAL_RANGE = 75
 SPEED_LIMIT = 18
 
+MATCHING_FACTOR = 0.005
+
 g_boids = []
 
 class Boid:
@@ -42,9 +44,6 @@ def fly_to_center(boid):
     return
 
 def avoid_others(boid):
-    return
-
-def match_velocity(boid):
     return
 
 # Constrain a boid to within the window. If it gets too close to an edge,
@@ -106,44 +105,32 @@ function avoidOthers(boid) {
   boid.dy += moveY * avoidFactor;
 }
 
-// Find the average velocity (speed and direction) of the other boids and
-// adjust velocity slightly to match.
-function matchVelocity(boid) {
-  const matchingFactor = 0.05; // Adjust by this % of average velocity
-
-  let avgDX = 0;
-  let avgDY = 0;
-  let numNeighbors = 0;
-
-  for (let otherBoid of boids) {
-    if (distance(boid, otherBoid) < visualRange) {
-      avgDX += otherBoid.dx;
-      avgDY += otherBoid.dy;
-      numNeighbors += 1;
-    }
-  }
-
-  if (numNeighbors) {
-    avgDX = avgDX / numNeighbors;
-    avgDY = avgDY / numNeighbors;
-
-    boid.dx += (avgDX - boid.dx) * matchingFactor;
-    boid.dy += (avgDY - boid.dy) * matchingFactor;
-  }
-}
-
 """
-# Speed will naturally vary in flocking behavior,
-# but real animals can't go arbitrarily fast.
+
+def match_velocity(boid) :
+    # Find the average velocity (speed and direction) of the other boids and
+    # adjust velocity slightly to match.
+    avg_vel = 0+0j
+    num_neighbors = 0
+    for otherBoid in g_boids:
+        if abs(boid.vel - otherBoid.vel) < VISUAL_RANGE :
+            avg_vel += otherBoid.vel;
+            num_neighbors += 1;
+
+    if num_neighbors > 0:
+        avg_vel /= num_neighbors
+
+    boid.vel += (avg_vel - boid.vel) * MATCHING_FACTOR
+
 def limit_speed(boid) :
+    # Speed will naturally vary in flocking behavior,
+    # but real animals can't go arbitrarily fast.
     speed = abs(boid.vel)
     if (speed > SPEED_LIMIT) :
         boid.vel = boid.vel / speed * SPEED_LIMIT
     return
 
 def draw_boid(boid):
-  # could make actor image
-  # screen.draw.circle(100, 100, 5)
   screen.draw.circle((boid.loc.real, boid.loc.imag), 4, (255, 0, 0))
   angle = math.atan2(boid.vel.real, boid.vel.imag)
   # draw tail
