@@ -10,7 +10,7 @@ DOT_COLOR = (0, 0, 0)
 SLING_COLOR = (0, 255, 0)
 HEIGHT = 400
 WIDTH = 800
-BALL = 'ball_100x100'
+BALL = 'blueball_100x100'
 DOG2 = 'dog2_100x100'
 BOUNCE_DAMPEN = 0.70
 AIR_DAMPEN = 0.99
@@ -41,7 +41,7 @@ def sim_motion():
     vx *= AIR_DAMPEN
     vy *= AIR_DAMPEN
 
-    if (vy < 0 and y < 0.40):
+    if (vy < 0 and y < 50 / SCALE):
         # bounce and dampen
         vy = -vy * BOUNCE_DAMPEN
     if vx > 0 and x > ((WIDTH - 50) / SCALE) :

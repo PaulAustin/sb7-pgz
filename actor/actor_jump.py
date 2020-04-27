@@ -8,7 +8,7 @@ WIDTH = 400
 
 DOG1 = 'dog1_100x100'
 DOG2 = 'dog2_100x100'
-BALL = 'ball_100x100'
+BALL = 'ball_64x64'
 
 GROUND_Y = 150
 JUMP_T   = 0.4

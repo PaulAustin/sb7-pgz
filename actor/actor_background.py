@@ -5,8 +5,8 @@
 BACK_COLOR = (200, 225, 255)
 HEIGHT = 300
 WIDTH = 1000
-BACKGROUND1 = 'background_mountains1_1000_200'
-BACKGROUND2 = 'background_mountains2_1000_200'
+BACKGROUND1 = 'background_mountains1_1000x200'
+BACKGROUND2 = 'background_mountains2_1000x200'
 BACKGOUND_TIME = 20.0
 
 back1 = Actor(BACKGROUND1, (500, 200))

@@ -5,7 +5,7 @@
 BACK_COLOR = (200, 225, 255)
 HEIGHT = 300
 WIDTH = 500
-BALL = 'ball_100x100'
+BALL = 'ball_64x64'
 DOG2 = 'dog2_100x100'
 
 ball = Actor(BALL, (100, 100))
