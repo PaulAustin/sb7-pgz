@@ -6,15 +6,20 @@
 import math
 import random
 
-HEIGHT = 500
-WIDTH = 500
-MARGIN = 150
+HEIGHT = 600
+WIDTH = 600
+MARGIN = 50
+
 
 NUM_BOIDS = 100
-VISUAL_RANGE = 75
-SPEED_LIMIT = 18
+VISUAL_RANGE = 50
+SPEED_LIMIT = 15     # Algorithm can generate big numbers, so limit it
+SPEED_INIT = 15
 
-MATCHING_FACTOR = 0.005
+MIN_DISTANCE = 20    # The distance to stay away from other boids
+AVOID_FACTOR = 0.05  # Adjust velocity by this %
+
+MATCHING_FACTOR = 0.010
 
 g_boids = []
 
@@ -25,8 +30,12 @@ def init_boids():
     boids = []
     for i in range(NUM_BOIDS):
         boid = Boid()
-        boid.loc = complex((random.randint(0, WIDTH)), (random.randint(0, HEIGHT)))
-        boid.vel = complex((random.randint(-10, 10)), (random.randint(-10, 10)))
+        boid.loc = complex(
+            (random.randint(0, WIDTH)),
+            (random.randint(0, HEIGHT)))
+        boid.vel = complex(
+            (random.randint(-SPEED_INIT, SPEED_INIT)),
+            (random.randint(-SPEED_INIT, SPEED_INIT)))
         boid.history = []
         boids.append(boid)
     return boids
@@ -37,13 +46,11 @@ def n_closest_boids(boids, n):
     # slice
     return
 
-def fly_to_center(boid):
-    return
-
-# Constrain a boid to within the window. If it gets too close to an edge,
-# nudge it back in and reverse its direction.
 def keep_within_bounds(boid) :
-    if (boid.loc.real < MARGIN) :
+    # Constrain a boid to within the window. If it gets too close to an edge,
+    # nudge it back in and reverse its direction.
+
+    if (boid.loc.real < MARGIN):
         boid.vel += 1+0j
     if (boid.loc.real >  WIDTH - MARGIN) :
         boid.vel += -1+0j
@@ -53,39 +60,27 @@ def keep_within_bounds(boid) :
         boid.vel += 0-1j
     return
 
-"""
-// Find the center of mass of the other boids and adjust velocity slightly to
-// point towards the center of mass.
-function flyTowardsCenter(boid) {
-  const centeringFactor = 0.005; // adjust velocity by this %
+def fly_towards_center(boid):
+    # Find the center of mass of the other boids and adjust velocity slightly to
+    # point towards the center of mass.
 
-  let centerX = 0;
-  let centerY = 0;
-  let numNeighbors = 0;
+    CENTERING_FACTOR = 0.005; # adjust velocity by this %
+    center = 0+0j
+    num_neighbors = 0
 
-  for (let otherBoid of boids) {
-    if (distance(boid, otherBoid) < visualRange) {
-      centerX += otherBoid.x;
-      centerY += otherBoid.y;
-      numNeighbors += 1;
-    }
-  }
+    for other_boid in g_boids :
+        if abs(boid.loc - other_boid.loc) < VISUAL_RANGE :
+            center += other_boid.loc
+            num_neighbors += 1;
 
-  if (numNeighbors) {
-    centerX = centerX / numNeighbors;
-    centerY = centerY / numNeighbors;
+    if num_neighbors > 0 :
+        center = center / num_neighbors
 
-    boid.dx += (centerX - boid.x) * centeringFactor;
-    boid.dy += (centerY - boid.y) * centeringFactor;
-  }
-}
+    boid.loc += (center - boid.loc) * CENTERING_FACTOR
 
-"""
 
-def avoid_others(boid) :
+def avoid_others(boid):
     # Move away from other boids that are too close to avoid colliding
-    MIN_DISTANCE = 20    # The distance to stay away from other boids
-    AVOID_FACTOR = 0.05  # Adjust velocity by this %
 
     move = 0+0j
     for other_boid in g_boids :
@@ -95,7 +90,7 @@ def avoid_others(boid) :
 
     boid.vel += move * AVOID_FACTOR
 
-def match_velocity(boid) :
+def match_velocity(boid):
     # Find the average velocity (speed and direction) of the other boids and
     # adjust velocity slightly to match.
     avg_vel = 0+0j
@@ -110,7 +105,7 @@ def match_velocity(boid) :
 
     boid.vel += (avg_vel - boid.vel) * MATCHING_FACTOR
 
-def limit_speed(boid) :
+def limit_speed(boid):
     # Speed will naturally vary in flocking behavior,
     # but real animals can't go arbitrarily fast.
     speed = abs(boid.vel)
@@ -119,10 +114,10 @@ def limit_speed(boid) :
     return
 
 def draw_boid(boid):
-  screen.draw.circle((boid.loc.real, boid.loc.imag), 4, (255, 0, 0))
-  angle = math.atan2(boid.vel.real, boid.vel.imag)
-  # draw tail
-  return
+    screen.draw.circle((boid.loc.real, boid.loc.imag), 4, (255, 0, 0))
+    angle = math.atan2(boid.vel.real, boid.vel.imag)
+    # draw tail
+    return
 
 def draw():
     screen.fill((0,0,0))
@@ -130,17 +125,17 @@ def draw():
         draw_boid(boid)
 
 def update():
-  for boid in g_boids:
-    # Apply rules
-    fly_to_center(boid)
-    avoid_others(boid)
-    match_velocity(boid)
-    limit_speed(boid)
-    keep_within_bounds(boid)
+    for boid in g_boids:
+        # Apply rules
+        fly_towards_center(boid)
+        avoid_others(boid)
+        match_velocity(boid)
+        limit_speed(boid)
+        keep_within_bounds(boid)
 
-    # Update the position based on the current velocity
-    boid.loc += boid.vel
-    # boid.history.append(boid.loc)
-    # boid.history = boid.history.slice(-50);
+        # Update the position based on the current velocity
+        boid.loc += boid.vel
+        # boid.history.append(boid.loc)
+        # boid.history = boid.history.slice(-50);
 
 g_boids = init_boids()
