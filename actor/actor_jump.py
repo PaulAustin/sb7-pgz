@@ -3,50 +3,51 @@
 # then 'accelerate' for down
 
 BACK_COLOR = (200, 225, 255)
-HEIGHT = 200
-WIDTH = 400
+HEIGHT = 300
+WIDTH = 500
 
 DOG1 = 'dog1_100x100'
 DOG2 = 'dog2_100x100'
 BALL = 'ball_64x64'
 
-GROUND_Y = 150
-JUMP_T   = 0.4
-JUMP_Y   = 100
+GROUND_X = WIDTH / 2
+GROUND_Y = HEIGHT - 50
+JUMP_T = 0.8
+JUMP_Y = 150
 
 class Game:
     def __init__(self):
-        self.dog = Actor(DOG2, (200, GROUND_Y))
+        self.dog = Actor(DOG2, (GROUND_X, GROUND_Y))
         self.ani_obj = None
         self.jumping = False
         self.flip_direction = 1
 
     def on_update(self):
-        if keyboard.space and self.ani_obj == None:
+        if keyboard.space and self.ani_obj is None:
             # Start the jump by moving up
             # slowing as it gets to the peak
             self.jumping = True
             self.ani_obj = animate(self.dog,
                 tween='decelerate',
-                duration = JUMP_T,
-                on_finished = animation_done,
-                pos = (200, GROUND_Y - JUMP_Y))
+                duration=JUMP_T / 2,
+                on_finished=animation_done,
+                pos=(GROUND_X, GROUND_Y - JUMP_Y))
 
             # A second animation does a flip
             # This one is set to be twice as long
             # The the jump is split into two parts
             animate(self.dog,
                 tween='linear',
-                duration = JUMP_T * 2,
-                on_finished = None,
-                angle = 360 * self.flip_direction)
+                duration=JUMP_T,
+                on_finished=None,
+                angle=360 * self.flip_direction)
             sounds.bark.play()
             self.flip_direction *= -1
 
     def on_draw(self):
         screen.fill(BACK_COLOR)
-        screen.draw.text("Angle = " + str(int(self.dog.angle)),(20,20))
-        screen.draw.text("Pos = " + str(int(self.dog.pos[1])),(20,40))
+        screen.draw.text("Angle = " + str(int(self.dog.angle)), (20, 20))
+        screen.draw.text("Pos = " + str(int(self.dog.pos[1])), (20, 40))
         self.dog.draw()
 
     def on_ani_done(self):
@@ -56,9 +57,9 @@ class Game:
             # starting slowing the speeding up
             self.ani_obj = animate(self.dog,
                 tween='accelerate',
-                duration = JUMP_T,
-                on_finished = animation_done,
-                pos = (200, GROUND_Y))
+                duration=JUMP_T / 2,
+                on_finished=animation_done,
+                pos=(GROUND_X, GROUND_Y))
             self.jumping = False
         else:
             # Reset the angle so next fil will work
