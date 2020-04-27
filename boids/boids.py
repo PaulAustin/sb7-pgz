@@ -12,9 +12,9 @@ MARGIN = 150                # disstance to start avoid edge
 
 NUM_BOIDS = 100
 VISUAL_RANGE = 70           # range of influence for most algoriths
-SPEED_LIMIT_UPPER = 15
-SPEED_LIMIT_LOWER = 3
-SPEED_INIT = 15
+SPEED_LIMIT_UPPER = 15      # boids canonly fly so fast.
+SPEED_LIMIT_LOWER = 3       # boid will fall if flying too slow
+SPEED_INIT = 12             # range for random velocity
 
 MIN_DISTANCE = 10           # the distance to stay away from other boids
 AVOID_FACTOR = 0.05         # % location change if too close
@@ -40,12 +40,6 @@ def init_boids():
         boids.append(boid)
     return boids
 
-def n_closest_boids(boids, n):
-    # make copy of array
-    # sort
-    # slice
-    return
-
 def keep_within_bounds(boid) :
     # Constrain a boid to within the window. If it gets too close to an edge,
     # nudge it back in and reverse its direction.
@@ -64,7 +58,6 @@ def fly_towards_center(boid):
     # Find the center of mass of the other boids and
     # adjust velocity slightly to point towards the
     # center of mass.
-
     center = 0+0j
     num_neighbors = 0
 
