@@ -6,20 +6,20 @@
 import math
 import random
 
-HEIGHT = 600
-WIDTH = 600
-MARGIN = 50
-
+HEIGHT = 600        # window height
+WIDTH = 600         # window width
+MARGIN = 50         # disstance to start avoid edge
 
 NUM_BOIDS = 100
-VISUAL_RANGE = 50
-SPEED_LIMIT = 15     # Algorithm can generate big numbers, so limit it
+VISUAL_RANGE = 50   # range of influence for most algoriths
+SPEED_LIMIT_UPPER = 15
+SPEED_LIMIT_LOWER = 6
 SPEED_INIT = 15
 
-MIN_DISTANCE = 20    # The distance to stay away from other boids
-AVOID_FACTOR = 0.05  # Adjust velocity by this %
+MIN_DISTANCE = 8   # The distance to stay away from other boids
+AVOID_FACTOR = 0.05 # Adjust velocity by this %
 
-MATCHING_FACTOR = 0.010
+MATCHING_FACTOR = 0.015
 
 g_boids = []
 
@@ -96,7 +96,7 @@ def match_velocity(boid):
     avg_vel = 0+0j
     num_neighbors = 0
     for otherBoid in g_boids:
-        if abs(boid.vel - otherBoid.vel) < VISUAL_RANGE :
+        if abs(boid.loc - otherBoid.loc) < VISUAL_RANGE :
             avg_vel += otherBoid.vel;
             num_neighbors += 1;
 
@@ -109,8 +109,10 @@ def limit_speed(boid):
     # Speed will naturally vary in flocking behavior,
     # but real animals can't go arbitrarily fast.
     speed = abs(boid.vel)
-    if (speed > SPEED_LIMIT) :
-        boid.vel = boid.vel / speed * SPEED_LIMIT
+    if (speed > SPEED_LIMIT_UPPER) :
+        boid.vel = boid.vel / speed * SPEED_LIMIT_UPPER
+    if (speed < SPEED_LIMIT_LOWER) :
+        boid.vel = boid.vel / speed * SPEED_LIMIT_LOWER
     return
 
 def draw_boid(boid):
