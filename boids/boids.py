@@ -6,20 +6,20 @@
 import math
 import random
 
-HEIGHT = 600        # window height
+HEIGHT = 500        # window height
 WIDTH = 600         # window width
 MARGIN = 50         # disstance to start avoid edge
 
 NUM_BOIDS = 100
-VISUAL_RANGE = 50   # range of influence for most algoriths
-SPEED_LIMIT_UPPER = 15
-SPEED_LIMIT_LOWER = 6
+VISUAL_RANGE = 75   # range of influence for most algoriths
+SPEED_LIMIT_UPPER = 10
+SPEED_LIMIT_LOWER = 3
 SPEED_INIT = 15
 
 MIN_DISTANCE = 8   # The distance to stay away from other boids
 AVOID_FACTOR = 0.05 # Adjust velocity by this %
 
-MATCHING_FACTOR = 0.015
+MATCHING_FACTOR = 0.025
 
 g_boids = []
 
@@ -81,7 +81,6 @@ def fly_towards_center(boid):
 
 def avoid_others(boid):
     # Move away from other boids that are too close to avoid colliding
-
     move = 0+0j
     for other_boid in g_boids :
         if other_boid != boid :
@@ -107,7 +106,7 @@ def match_velocity(boid):
 
 def limit_speed(boid):
     # Speed will naturally vary in flocking behavior,
-    # but real animals can't go arbitrarily fast.
+    # but real animals can't go arbitrarily fast (or slow)
     speed = abs(boid.vel)
     if (speed > SPEED_LIMIT_UPPER) :
         boid.vel = boid.vel / speed * SPEED_LIMIT_UPPER
@@ -116,9 +115,14 @@ def limit_speed(boid):
     return
 
 def draw_boid(boid):
-    screen.draw.circle((boid.loc.real, boid.loc.imag), 4, (255, 0, 0))
-    angle = math.atan2(boid.vel.real, boid.vel.imag)
-    # draw tail
+    screen.draw.filled_circle((boid.loc.real, boid.loc.imag), 5, (0, 255, 0))
+    tail = boid.loc + boid.vel * 1.8
+    screen.draw.line(
+        (boid.loc.real, boid.loc.imag),
+        (tail.real, tail.imag),
+        (0,255,0))
+
+    # angle = math.atan2(boid.vel.real, boid.vel.imag)
     return
 
 def draw():
