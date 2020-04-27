@@ -2,24 +2,24 @@
 # Designed to work well with mu-editor environment.
 #
 # Original by Ben Eater at https://github.com/beneater/boids (MIT License)
+# No endorsement implied.
 
-import math
 import random
 
-HEIGHT = 500        # window height
-WIDTH = 600         # window width
-MARGIN = 50         # disstance to start avoid edge
+HEIGHT = 600                # window height
+WIDTH = 700                 # window width
+MARGIN = 150                # disstance to start avoid edge
 
 NUM_BOIDS = 100
-VISUAL_RANGE = 75   # range of influence for most algoriths
-SPEED_LIMIT_UPPER = 10
+VISUAL_RANGE = 70           # range of influence for most algoriths
+SPEED_LIMIT_UPPER = 15
 SPEED_LIMIT_LOWER = 3
 SPEED_INIT = 15
 
-MIN_DISTANCE = 8   # The distance to stay away from other boids
-AVOID_FACTOR = 0.05 # Adjust velocity by this %
-
-MATCHING_FACTOR = 0.025
+MIN_DISTANCE = 10           # the distance to stay away from other boids
+AVOID_FACTOR = 0.05         # % location change if too close
+CENTERING_FACTOR = 0.005    # % location change to pull to center
+MATCHING_FACTOR = 0.015     # % velocity change if close
 
 g_boids = []
 
@@ -34,8 +34,8 @@ def init_boids():
             (random.randint(0, WIDTH)),
             (random.randint(0, HEIGHT)))
         boid.vel = complex(
-            (random.randint(-SPEED_INIT, SPEED_INIT)),
-            (random.randint(-SPEED_INIT, SPEED_INIT)))
+            (random.randint(0, SPEED_INIT)),
+            (random.randint(0, SPEED_INIT)))
         boid.history = []
         boids.append(boid)
     return boids
@@ -51,27 +51,27 @@ def keep_within_bounds(boid) :
     # nudge it back in and reverse its direction.
 
     if (boid.loc.real < MARGIN):
-        boid.vel += 1+0j
-    if (boid.loc.real >  WIDTH - MARGIN) :
-        boid.vel += -1+0j
+        boid.vel += 0.4+0j
+    if (boid.loc.real > WIDTH - MARGIN) :
+        boid.vel += -0.4+0j
     if (boid.loc.imag < MARGIN) :
-        boid.vel += 0+1j
-    if (boid.loc.imag >  HEIGHT - MARGIN) :
-        boid.vel += 0-1j
+        boid.vel += 0+0.4j
+    if (boid.loc.imag > HEIGHT - MARGIN) :
+        boid.vel += 0-0.4j
     return
 
 def fly_towards_center(boid):
-    # Find the center of mass of the other boids and adjust velocity slightly to
-    # point towards the center of mass.
+    # Find the center of mass of the other boids and
+    # adjust velocity slightly to point towards the
+    # center of mass.
 
-    CENTERING_FACTOR = 0.005; # adjust velocity by this %
     center = 0+0j
     num_neighbors = 0
 
     for other_boid in g_boids :
         if abs(boid.loc - other_boid.loc) < VISUAL_RANGE :
             center += other_boid.loc
-            num_neighbors += 1;
+            num_neighbors += 1
 
     if num_neighbors > 0 :
         center = center / num_neighbors
@@ -83,7 +83,7 @@ def avoid_others(boid):
     # Move away from other boids that are too close to avoid colliding
     move = 0+0j
     for other_boid in g_boids :
-        if other_boid != boid :
+        if not (other_boid is boid) :
             if abs(boid.loc - other_boid.loc) < MIN_DISTANCE :
                 move += boid.loc - other_boid.loc
 
@@ -96,8 +96,8 @@ def match_velocity(boid):
     num_neighbors = 0
     for otherBoid in g_boids:
         if abs(boid.loc - otherBoid.loc) < VISUAL_RANGE :
-            avg_vel += otherBoid.vel;
-            num_neighbors += 1;
+            avg_vel += otherBoid.vel
+            num_neighbors += 1
 
     if num_neighbors > 0:
         avg_vel /= num_neighbors
@@ -120,13 +120,13 @@ def draw_boid(boid):
     screen.draw.line(
         (boid.loc.real, boid.loc.imag),
         (tail.real, tail.imag),
-        (0,255,0))
+        (0, 255, 0))
 
     # angle = math.atan2(boid.vel.real, boid.vel.imag)
     return
 
 def draw():
-    screen.fill((0,0,0))
+    screen.fill((0, 0, 0))
     for boid in g_boids:
         draw_boid(boid)
 
