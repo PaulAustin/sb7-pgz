@@ -31,9 +31,6 @@ def init_boids():
         boids.append(boid)
     return boids
 
-def distance(boid1, boid2):
-    return abs(boid1.loc - boid2.loc)
-
 def n_closest_boids(boids, n):
     # make copy of array
     # sort
@@ -41,9 +38,6 @@ def n_closest_boids(boids, n):
     return
 
 def fly_to_center(boid):
-    return
-
-def avoid_others(boid):
     return
 
 # Constrain a boid to within the window. If it gets too close to an edge,
@@ -86,26 +80,20 @@ function flyTowardsCenter(boid) {
   }
 }
 
-// Move away from other boids that are too close to avoid colliding
-function avoidOthers(boid) {
-  const minDistance = 20; // The distance to stay away from other boids
-  const avoidFactor = 0.05; // Adjust velocity by this %
-  let moveX = 0;
-  let moveY = 0;
-  for (let otherBoid of boids) {
-    if (otherBoid !== boid) {
-      if (distance(boid, otherBoid) < minDistance) {
-        moveX += boid.x - otherBoid.x;
-        moveY += boid.y - otherBoid.y;
-      }
-    }
-  }
-
-  boid.dx += moveX * avoidFactor;
-  boid.dy += moveY * avoidFactor;
-}
-
 """
+
+def avoid_others(boid) :
+    # Move away from other boids that are too close to avoid colliding
+    MIN_DISTANCE = 20    # The distance to stay away from other boids
+    AVOID_FACTOR = 0.05  # Adjust velocity by this %
+
+    move = 0+0j
+    for other_boid in g_boids :
+        if other_boid != boid :
+            if abs(boid.loc - other_boid.loc) < MIN_DISTANCE :
+                move += boid.loc - other_boid.loc
+
+    boid.vel += move * AVOID_FACTOR
 
 def match_velocity(boid) :
     # Find the average velocity (speed and direction) of the other boids and
