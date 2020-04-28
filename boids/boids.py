@@ -14,7 +14,7 @@ NUM_BOIDS = 100
 VISUAL_RANGE = 70           # range of influence for most algoriths
 SPEED_LIMIT_UPPER = 15      # boids canonly fly so fast.
 SPEED_LIMIT_LOWER = 3       # boid will fall if flying too slow
-SPEED_INIT = 12             # range for random velocity
+SPEED_INIT = 15             # range for random velocity
 
 MIN_DISTANCE = 10           # the distance to stay away from other boids
 AVOID_FACTOR = 0.05         # % location change if too close
