@@ -2,21 +2,26 @@
 # pull the ball back as if it is a sling shot
 # with the pgz animation function
 
-BACK_COLOR = (200, 225, 255)
+BACK_COLOR_DAY = (200, 225, 255)
+BACK_COLOR_NIGHT = (50, 50, 128)
 HEIGHT = 300
 WIDTH = 1000
+BACKGROUND0 = 'background_mountains0_1000x200'
 BACKGROUND1 = 'background_mountains1_1000x200'
-BACKGROUND2 = 'background_mountains2_1000x200'
-BACKGOUND_TIME = 20.0
+BACKGOUND_TIME = 10.0
 
-back1 = Actor(BACKGROUND1, (500, 200))
-back2 = Actor(BACKGROUND2, (1500, 200))
-g_backgrounds = [back1, back2]
+back0 = Actor(BACKGROUND0, (500, 200))
+back1 = Actor(BACKGROUND1, (1500, 200))
+g_backgrounds = [back0, back1]
 
 def draw():
-    screen.fill(BACK_COLOR)
-    back1.draw()
-    back2.draw()
+    if not keyboard.space:
+        screen.fill(BACK_COLOR_DAY)
+    else:
+        screen.fill(BACK_COLOR_NIGHT)
+    b0, b1 = g_backgrounds
+    b0.draw()
+    b1.draw()
 
 def background_repeat():
     b0 = g_backgrounds.pop(0)
