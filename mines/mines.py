@@ -25,7 +25,7 @@ CELL_SIZE = 30
 # Basic game parameters
 ROWS = 15
 COLS = 15
-MINES = 10
+MINES = 15
 
 # Build a list of lists
 def build_grid(rows, cols, filler):
@@ -42,6 +42,7 @@ def place_mines(grid, mines):
     # Attempt to place n mines, if one already placed
     # try again, but only so many attempts
     # loop will alwasy exit.
+
     max_tries = len(grid) * len(grid[0]) * 2
     while mines > 0 and max_tries > 0 :
         r = random.randint(0, len(grid) - 1)
@@ -57,7 +58,7 @@ def place_mines(grid, mines):
     return mines == 0
 
 
-# Build a list neighbors omitting ones off the edge
+# Build a list of neighbors, omitting ones off the edge
 def list_of_neighbors(grid, r, c):
     neighbors = []
     for rn in range(max(0,r-1), min(r+2,len(grid))):
