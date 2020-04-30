@@ -134,6 +134,7 @@ def draw():
         boid.draw()
     screen.draw.text("space:tails  r:restart", (20, 20))
 
+
 def update():
     for boid in g_boids:
         # Apply rules
