@@ -1,160 +1,152 @@
-# Ported from JavaSript version to Python and Pygame Zero
-# Designed to work well with mu-editor environment.
-#
-# The original Javascript version wasdonw by Ben Eater
-# at https://github.com/beneater/boids (MIT License)
-# No endorsement implied.
-#
-# Complex numbers are are used as vectors to integrate x and y positions and velocities
-# MIT licesense (details in parent directory)
+# Example using pygame-zero actor object
+# working on the sling shot
+# with the pgz animation function
 
-import random
+import math
 import time
+import random
 
-HEIGHT = 500                # window height
-WIDTH = 700                 # window width
-MARGIN = 150                # disstance to start avoid edge
+BACK_COLOR = (0, 0, 128)
+DOT_COLOR = (0, 0, 0)
+SLING_COLOR = (0, 255, 0)
+HEIGHT = 600
+WIDTH = 1200
+BALL = 'blueball_75x75'
+VIRUS_C = 'cvc_50x50.png'
+VIRUS_R = 'cvr_50x50.png'
+VIRUS_Y = 'cvy_50x50.png'
+DOG2 = 'dog2_100x100'
+BOUNCE_DAMPEN = 0.90
+AIR_DAMPEN = 0.99
+SPRING_FACTOR = 8.0
 
-NUM_BOIDS = 75
-VISUAL_RANGE = 70           # radius of influence for most algoriths
-SPEED_LIMIT_UPPER = 13      # boids canonly fly so fast.
-SPEED_LIMIT_LOWER = 3       # boid will fall if flying too slow
-SPEED_INIT = 20             # range for random velocity
+DOT_POS = (200, 200)
 
-MIN_DISTANCE = 10           # the distance to stay away from other boids
-AVOID_FACTOR = 0.05         # % location change if too close
-CENTERING_FACTOR = 0.050    # % location change to pull to center
-MATCHING_FACTOR = 0.015     # % velocity change if close
-MARGIN_FACTOR = 0.25+0.0j   # rate of turning away from edge
+GRAVITY = -9.81   # meters / seconds^2
+SCALE   = 100.0   # 100px  / meter
+DRAG    = 1.0
+TARGET_T_DELTA = 0.01
 
-HISTORY_LENGTH = 25
+NUM_VIR = 40
+TARGET_NAMES = [VIRUS_C, VIRUS_R, VIRUS_Y]
+g_targets = []
 
-BACK_COLOR = (0, 0, 0)
-BOID_COLOR = (0, 255, 0)
-TRAIL_COLOR = (0, 170, 170)
+ball = Actor(BALL, (100, 100))
 
-g_boids = []
+g_run_sim = False
 
-class Boid:
-    def __init__(boid) :
-        boid.loc = complex(
-            (random.randint(0, WIDTH)),
-            (random.randint(0, HEIGHT)))
-        boid.vel = complex(
-            (random.randint(-SPEED_INIT, SPEED_INIT)),
-            (random.randint(-SPEED_INIT, SPEED_INIT)))
-        boid.history = []
 
-    def keep_within_bounds(boid) :
-        # Constrain a boid to within the window. If it gets too close to an edge,
-        # nudge it back in and reverse its direction.
+def sim_motion():
+    global t_last
 
-        if (boid.loc.real < MARGIN):
-            boid.vel += MARGIN_FACTOR * 1.0
-        if (boid.loc.real > WIDTH - MARGIN) :
-            boid.vel += MARGIN_FACTOR * -1.0
-        if (boid.loc.imag < MARGIN) :
-            boid.vel += MARGIN_FACTOR * 1.0j
-        if (boid.loc.imag > HEIGHT - MARGIN) :
-            boid.vel += MARGIN_FACTOR * -1.0j
+    # use the monotonic timer to measure the real delta time
+    t_now = time.monotonic()
+    t_delta = t_now - t_last
+    t_last = t_now
 
-    def fly_towards_center(boid):
-        # Find the center of mass of the other boids and
-        # adjust velocity slightly to point towards the
-        # center of mass.
-        center = 0+0j
-        num_neighbors = 0
+    x, y   = ball.posm
+    vx, vy = ball.velocity
+    ax, ay = ball.accel
 
-        for other_boid in g_boids :
-            if abs(boid.loc - other_boid.loc) < VISUAL_RANGE :
-                center += other_boid.loc
-                num_neighbors += 1
+    vx *= AIR_DAMPEN
+    vy *= AIR_DAMPEN
 
-        if num_neighbors > 0 :
-            center = center / num_neighbors
+    if (vy < 0 and y < 50 / SCALE):
+        # bounce and dampen
+        vy = -vy * BOUNCE_DAMPEN
+    if vx > 0 and x > ((WIDTH - 50) / SCALE) :
+        vx = -vx * BOUNCE_DAMPEN
+    elif vx < 0 and x < 50 / SCALE:
+        vx = -vx * BOUNCE_DAMPEN
 
-        boid.loc += (center - boid.loc) * CENTERING_FACTOR
+    vx *= DRAG
+    vy *= DRAG
+    ball.posm = (x + (vx * t_delta), y + (vy * t_delta))
+    ball.velocity = (vx + (ax * t_delta), vy + (ay * t_delta))
 
-    def avoid_others(boid):
-        # Move away from other boids that are too close to avoid colliding
-        move = 0+0j
-        for other_boid in g_boids :
-            if not (other_boid is boid) :
-                if abs(boid.loc - other_boid.loc) < MIN_DISTANCE :
-                    move += boid.loc - other_boid.loc
+    # Translate meter values to pixel locations
+    ball.pos = (ball.posm[0] * SCALE), (HEIGHT - ball.posm[1] * SCALE)
 
-        boid.vel += move * AVOID_FACTOR
+    for t in g_targets:
+        if ball.distance_to(t) < 40.5 :
+            sounds.pop.play()
+            g_targets.remove(t)
+        else:
+            tx, ty = t.pos
+            vx, vy = t.velocity
+            t.pos = (tx + vx, ty + vy)
 
-    def match_velocity(boid):
-        # Find the average velocity (speed and direction) of the other boids and
-        # adjust velocity slightly to match.
-        avg_vel = 0+0j
-        num_neighbors = 0
-        for otherBoid in g_boids:
-            if abs(boid.loc - otherBoid.loc) < VISUAL_RANGE :
-                avg_vel += otherBoid.vel
-                num_neighbors += 1
 
-        if num_neighbors > 0:
-            avg_vel /= num_neighbors
 
-        boid.vel += (avg_vel - boid.vel) * MATCHING_FACTOR
+    if (abs(vy) < 0.02 and abs(vx) < 0.02):
+        # Close to still, stop the sim loop
+        reset_sim()
+    else:
+        clock.schedule(sim_motion, TARGET_T_DELTA)
+    return
 
-    def limit_speed(boid):
-        # Speed will naturally vary in flocking behavior,
-        # but real animals can't go arbitrarily fast (or slow)
-        speed = abs(boid.vel)
-        if (speed > SPEED_LIMIT_UPPER) :
-            boid.vel = boid.vel / speed * SPEED_LIMIT_UPPER
-        if (speed < SPEED_LIMIT_LOWER) :
-            boid.vel = boid.vel / speed * SPEED_LIMIT_LOWER
-        return
+def spread_targets():
+    g_targets.clear()
+    for i in range(NUM_VIR):
+        name = random.choice(TARGET_NAMES)
+        loc = (random.randint(300, WIDTH-50), random.randint(100, HEIGHT-50))
+        target = Actor(name, loc)
+        target.velocity = (3.0, 5.0)
+        g_targets.append(target)
 
-    def draw(boid):
-        screen.draw.filled_circle((boid.loc.real, boid.loc.imag), 5, (0, 255, 0))
-        tail = boid.loc + boid.vel * -1.8
-        screen.draw.line(
-            (boid.loc.real, boid.loc.imag),
-            (tail.real, tail.imag),
-            BOID_COLOR)
-
-    def draw_trail(boid):
-        pt_from = (boid.loc.real, boid.loc.imag)
-        for p in boid.history:
-            pt_to = (p.real, p.imag)
-            screen.draw.line(pt_from, pt_to, TRAIL_COLOR)
-            pt_from = pt_to
+def reset_sim():
+    g_run_sim = False
+    ball.posm = (1.0, 1.0)           # position in meters
+    ball.velocity = (0.0, 0.0)
+    ball.accel = (0.0, GRAVITY)
+    t_last = 0
+    t_drop = 0
 
 def draw():
-    screen.fill((0, 0, 0))
-    if keyboard.space:
-        for boid in g_boids:
-            boid.draw_trail()
-    for boid in g_boids:
-        boid.draw()
-    screen.draw.text("space:tails  r:restart", (20, 20))
+    screen.fill(BACK_COLOR)
+    ball.draw()
+    screen.draw.filled_circle(DOT_POS, 10, DOT_COLOR)
 
+    for t in g_targets:
+        t.draw()
 
-def update():
-    for boid in g_boids:
-        # Apply rules
-        boid.fly_towards_center()
-        boid.avoid_others()
-        boid.match_velocity()
-        boid.limit_speed()
-        boid.keep_within_bounds()
+    if (not g_run_sim):
+        screen.draw.line(DOT_POS, ball.pos, SLING_COLOR)
 
-        # Update the position based on the current velocity
-        boid.loc += boid.vel
-        boid.history.insert(0, boid.loc)
-        boid.history = boid.history[:HISTORY_LENGTH]
+def on_mouse_down(pos,button):
+    reset_sim()
+    on_mouse_move(pos, (0,0), {button})
 
-def init():
-    global g_boids
-    g_boids = [Boid() for _ in range(NUM_BOIDS)]
+def on_mouse_up(pos):
+    global t_last, t_drop, g_run_sim
+
+    g_run_sim = True
+    ball.pos = pos
+    ball.posm = ball.pos[0] / SCALE, (HEIGHT - ball.pos[1]) / SCALE
+    ball.accel = (0.0, GRAVITY)
+
+    stretch = ball.distance_to(DOT_POS) / SCALE
+    rad = math.radians(ball.angle_to(DOT_POS))
+    if (stretch < 0.5):
+        ball.velocity = (0, 0)
+    else:
+        stretch *= SPRING_FACTOR
+        ball.velocity = (stretch * math.cos(rad), stretch * math.sin(rad))
+
+    t_last = t_drop = time.monotonic()
+    clock.schedule(sim_motion, TARGET_T_DELTA)
+
+def on_mouse_move(pos, rel, buttons):
+    if (mouse.LEFT in buttons) :
+        ball.pos = pos
 
 def on_key_down(key, mod, unicode):
-    if (key == keys.R):
-        init()
+    if (key == keys.V):
+        for i in range(NUM_VIR):
+            viru = Actor(VIRUS,
+                (random.randint(300, WIDTH-50), random.randint(100, HEIGHT-50)))
+        virs.append(viru)
 
-init()
+
+reset_sim()
+spread_targets()
