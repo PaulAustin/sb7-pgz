@@ -15,40 +15,11 @@ WIDTH = (COLS * CELL_SIZE)
 BACK_COLOR = (0, 0, 127)
 CELL_COLOR = (0, 200, 0)
 
-XXX = True
-OOO = False
-#         How many neighboring cells
-#            0   1   2   3   4   5   6   7   8
-# Classic rules
-# WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
-# STAYUP = [OOO,OOO,XXX,XXX,OOO,OOO,OOO,OOO,OOO]
-
-# Some others
-# mazish
-# WAKEUP = [OOO,OOO,OOO,XXX,OOO,OOO,OOO,OOO,OOO]
-# STAYUP = [OOO,OOO,XXX,XXX,XXX,OOO,OOO,OOO,OOO]
-
 def Rule(rule):
     return [(b != '_') for b in rule]
 
-# How many neighboring cells
-#                012345678
-# WAKEUP = Rule('___X_____')
-# STAYUP = Rule('__XX_____')
-
-# WAKEUP = Rule('___X_____')
-# STAYUP = Rule('___XX____')
-
-# WAKEUP = Rule('___X_____')
-# STAYUP = Rule('___XX____')
-
-# WAKEUP = Rule('___X_____')
-# STAYUP = Rule('___XXX___')
-
-# How many neighboring cells
-#              012345678
 WAKEUP = Rule('___X_____')
-STAYUP = Rule('___XXX___')
+STAYUP = Rule('__XX_____')
 
 g_changed = False
 g_running = True
