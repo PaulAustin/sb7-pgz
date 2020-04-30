@@ -6,7 +6,7 @@
 
 import random
 
-ROWS = 100
+ROWS = 80
 COLS = 150
 CELL_SIZE = 5
 HEIGHT = (ROWS * CELL_SIZE)
@@ -20,13 +20,13 @@ def Rule(rule):
 
 g_rules = [
     [
-        Rule('__X_X_X_X'),      # Wake up 10
+        Rule('__X_X_X_X'),      # Wake up 0 Wild stuff
         Rule('_X_X_X_X_')       # Stay up
     ],[
 #   This is the standard set of rules
 #   How many neighboring cells
-#                  012345678
-        Rule('___X_____'),      # Wake up 1
+#             012345678
+        Rule('___X_____'),      # Wake up 1  Standard game
         Rule('__XX_____')       # Stay up
     ],[
         Rule('___X_____'),      # Wake up 2
@@ -50,7 +50,7 @@ g_rules = [
         Rule('_XXX_____'),      # Wake up 8
         Rule('__XXXX___')       # Stay up
     ],[
-        Rule('__X______'),      # Wake up 9
+        Rule('__X______'),      # Wake up 9  Single cycle life
         Rule('___X_____')       # Stay up
     ]]
 
