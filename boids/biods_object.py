@@ -1,26 +1,31 @@
 # Ported from JavaSript version to Python and Pygame Zero
 # Designed to work well with mu-editor environment.
 #
-# Original by Ben Eater at https://github.com/beneater/boids (MIT License)
+# The original Javascript version wasdonw by Ben Eater
+# at https://github.com/beneater/boids (MIT License)
 # No endorsement implied.
+#
+# Complex numbers are are used as vectors to integrate x and y positions and velocities
+# MIT licesense (details in parent directory)
 
 import random
 import time
 
-HEIGHT = 600                # window height
+HEIGHT = 500                # window height
 WIDTH = 700                 # window width
 MARGIN = 150                # disstance to start avoid edge
 
-NUM_BOIDS = 100
-VISUAL_RANGE = 70           # range of influence for most algoriths
-SPEED_LIMIT_UPPER = 15      # boids canonly fly so fast.
+NUM_BOIDS = 75
+VISUAL_RANGE = 70           # radius of influence for most algoriths
+SPEED_LIMIT_UPPER = 13      # boids canonly fly so fast.
 SPEED_LIMIT_LOWER = 3       # boid will fall if flying too slow
-SPEED_INIT = 15             # range for random velocity
+SPEED_INIT = 20             # range for random velocity
 
 MIN_DISTANCE = 10           # the distance to stay away from other boids
 AVOID_FACTOR = 0.05         # % location change if too close
-CENTERING_FACTOR = 0.005    # % location change to pull to center
+CENTERING_FACTOR = 0.050    # % location change to pull to center
 MATCHING_FACTOR = 0.015     # % velocity change if close
+MARGIN_FACTOR = 0.25+0.0j   # rate of turning away from edge
 
 HISTORY_LENGTH = 25
 
@@ -45,13 +50,13 @@ class Boid:
         # nudge it back in and reverse its direction.
 
         if (boid.loc.real < MARGIN):
-            boid.vel += 0.4+0j
+            boid.vel += MARGIN_FACTOR * 1.0
         if (boid.loc.real > WIDTH - MARGIN) :
-            boid.vel += -0.4+0j
+            boid.vel += MARGIN_FACTOR * -1.0
         if (boid.loc.imag < MARGIN) :
-            boid.vel += 0+0.4j
+            boid.vel += MARGIN_FACTOR * 1.0j
         if (boid.loc.imag > HEIGHT - MARGIN) :
-            boid.vel += 0-0.4j
+            boid.vel += MARGIN_FACTOR * -1.0j
 
     def fly_towards_center(boid):
         # Find the center of mass of the other boids and
@@ -127,7 +132,7 @@ def draw():
             boid.draw_trail()
     for boid in g_boids:
         boid.draw()
-    screen.draw.text("space:tails  c:clear", (20, 20))
+    screen.draw.text("space:tails  r:restart", (20, 20))
 
 
 def update():
@@ -149,9 +154,7 @@ def init():
     g_boids = [Boid() for _ in range(NUM_BOIDS)]
 
 def on_key_down(key, mod, unicode):
-    if (key == keys.C):
+    if (key == keys.R):
         init()
 
 init()
-
-
