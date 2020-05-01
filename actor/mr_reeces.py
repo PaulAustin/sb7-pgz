@@ -80,8 +80,7 @@ def update():
     test_jump()
 
     if keyboard.V or len(g_targets) == 0:
-        spread_targets(25)
-
+        spread_targets(25, 15)
 
     for t in g_targets:
         if dog.distance_to(t) < 45 :
