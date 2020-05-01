@@ -139,19 +139,18 @@ def on_jump_done():
         dog.angle = 0
         sounds.pop.play()
 
-
-def spread_targets(max_speed):
+def spread_targets(count, max_speed):
     g_targets.clear()
-    for i in range(5):
+    for i in range(count):
         name = random.choice(TARGET_NAMES)
         loc = (random.randint(300, WIDTH-50), GROUND_Y)
         target = Actor(name, loc)
-        vx = -5 # random.randint(-max_speed, max_speed)
-        vy = 0 # random.randint(-max_speed, max_speed)
+        vx =  random.randint(-max_speed, max_speed)
+        vy =  random.randint(-max_speed, max_speed)
         target.velocity = (vx, vy)
         g_targets.append(target)
 
 scroll_backgrounds(g_backgrounds)
-spread_targets(15)
+spread_targets(15, 7)
 
 
