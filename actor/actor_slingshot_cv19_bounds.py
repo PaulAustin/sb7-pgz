@@ -7,7 +7,7 @@ import time
 import random
 
 BACK_COLOR = (0, 0, 128)
-DOT_COLOR = (0, 0, 0)
+DOT_COLOR = (0, 255, 0)
 SLING_COLOR = (0, 255, 0)
 HEIGHT = 600
 WIDTH = 1200
@@ -19,6 +19,8 @@ DOG2 = 'dog2_100x100'
 BOUNCE_DAMPEN = 0.90
 AIR_DAMPEN = 0.99
 SPRING_FACTOR = 8.0
+
+MAX_SPEED_LEVEL0 = 10
 
 DOT_POS = (200, 200)
 
@@ -68,14 +70,17 @@ def sim_motion():
     ball.pos = (ball.posm[0] * SCALE), (HEIGHT - ball.posm[1] * SCALE)
 
     for t in g_targets:
-        if ball.distance_to(t) < 40.5 :
+        if ball.distance_to(t) < 45 :
             sounds.pop.play()
             g_targets.remove(t)
         else:
             tx, ty = t.pos
             vx, vy = t.velocity
             t.pos = (tx + vx, ty + vy)
-
+            tx, ty = t.pos
+            if tx > WIDTH or tx < 0 : vx *= -1
+            if ty > HEIGHT or ty < 0 : vy *= -1
+            t.velocity = (vx, vy)
 
 
     if (abs(vy) < 0.02 and abs(vx) < 0.02):
@@ -85,13 +90,15 @@ def sim_motion():
         clock.schedule(sim_motion, TARGET_T_DELTA)
     return
 
-def spread_targets():
+def spread_targets(max_speed):
     g_targets.clear()
     for i in range(NUM_VIR):
         name = random.choice(TARGET_NAMES)
         loc = (random.randint(300, WIDTH-50), random.randint(100, HEIGHT-50))
         target = Actor(name, loc)
-        target.velocity = (3.0, 5.0)
+        vx = random.randint(-max_speed, max_speed)
+        vy = random.randint(-max_speed, max_speed)
+        target.velocity = (vx, vy)
         g_targets.append(target)
 
 def reset_sim():
@@ -149,4 +156,4 @@ def on_key_down(key, mod, unicode):
 
 
 reset_sim()
-spread_targets()
+spread_targets(MAX_SPEED_LEVEL0)
