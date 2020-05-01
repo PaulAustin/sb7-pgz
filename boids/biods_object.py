@@ -12,7 +12,7 @@ import random
 import time
 
 HEIGHT = 500                # window height
-WIDTH = 700                 # window width
+WIDTH = 900                 # window width
 MARGIN = 150                # disstance to start avoid edge
 
 NUM_BOIDS = 75
@@ -27,11 +27,12 @@ CENTERING_FACTOR = 0.050    # % location change to pull to center
 MATCHING_FACTOR = 0.015     # % velocity change if close
 MARGIN_FACTOR = 0.25+0.0j   # rate of turning away from edge
 
-HISTORY_LENGTH = 25
+HISTORY_LENGTH = 30
 
-BACK_COLOR = (0, 0, 0)
-BOID_COLOR = (0, 255, 0)
-TRAIL_COLOR = (0, 170, 170)
+BACK_COLOR = (0, 0, 90)
+BOID_COLOR = (255, 128, 128)
+BOID_SIZE = 8
+TRAIL_COLOR = (255, 255, 64)
 
 g_boids = []
 
@@ -86,10 +87,12 @@ class Boid:
         boid.vel += move * AVOID_FACTOR
 
     def match_velocity(boid):
-        # Find the average velocity (speed and direction) of the other boids and
-        # adjust velocity slightly to match.
+        # Find the average velocity (speed and direction)
+        # of the other boids and adjust velocity slightly to match.
+
         avg_vel = 0+0j
         num_neighbors = 0
+
         for otherBoid in g_boids:
             if abs(boid.loc - otherBoid.loc) < VISUAL_RANGE :
                 avg_vel += otherBoid.vel
@@ -111,7 +114,7 @@ class Boid:
         return
 
     def draw(boid):
-        screen.draw.filled_circle((boid.loc.real, boid.loc.imag), 5, (0, 255, 0))
+        screen.draw.filled_circle((boid.loc.real, boid.loc.imag), BOID_SIZE, BOID_COLOR)
         tail = boid.loc + boid.vel * -1.8
         screen.draw.line(
             (boid.loc.real, boid.loc.imag),
@@ -126,7 +129,7 @@ class Boid:
             pt_from = pt_to
 
 def draw():
-    screen.fill((0, 0, 0))
+    screen.fill(BACK_COLOR)
     if keyboard.space:
         for boid in g_boids:
             boid.draw_trail()
